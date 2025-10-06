@@ -81,3 +81,4 @@ CREATE TABLE IF NOT EXISTS public.test_nogs (
     location text,
     CONSTRAINT test_nogs_pkey PRIMARY KEY (id)
 );
+

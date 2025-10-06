@@ -27,3 +27,34 @@ array_relationships:
         table:
           name: favorites
           schema: public
+insert_permissions:
+  - role: organizer
+    permission:
+      check:
+        id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - cause
+        - contact_info
+        - created_at
+        - created_by
+        - description
+        - donation_link
+        - location
+        - name
+        - ngo_picture
+    comment: ""
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - cause
+        - contact_info
+        - created_at
+        - description
+        - donation_link
+        - location
+        - name
+        - ngo_picture
+      filter: {}
+    comment: ""
