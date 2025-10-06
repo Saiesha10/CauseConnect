@@ -1,0 +1,29 @@
+table:
+  name: ngos
+  schema: public
+object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: created_by
+array_relationships:
+  - name: donations
+    using:
+      foreign_key_constraint_on:
+        column: ngo_id
+        table:
+          name: donations
+          schema: public
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: ngo_id
+        table:
+          name: events
+          schema: public
+  - name: favorites
+    using:
+      foreign_key_constraint_on:
+        column: ngo_id
+        table:
+          name: favorites
+          schema: public

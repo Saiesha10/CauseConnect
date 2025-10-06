@@ -1,0 +1,10 @@
+table:
+  name: favorites
+  schema: public
+object_relationships:
+  - name: ngo
+    using:
+      foreign_key_constraint_on: ngo_id
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id

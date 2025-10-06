@@ -1,0 +1,7 @@
+version: 3
+endpoint: https://lasting-bream-91.hasura.app
+admin_secret: ZC0PR6tMt9NEGdeIeZgne25QpS0Lt65Nz5lp1Svy5CiSe3mlBGDKjlh0Q9cLHnRu
+metadata_directory: metadata
+actions:
+  kind: synchronous
+  handler_webhook_baseurl: http://localhost:3000

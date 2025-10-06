@@ -1,0 +1,82 @@
+table:
+  name: users
+  schema: public
+array_relationships:
+  - name: donations
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: donations
+          schema: public
+  - name: favorites
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: favorites
+          schema: public
+  - name: ngos
+    using:
+      foreign_key_constraint_on:
+        column: created_by
+        table:
+          name: ngos
+          schema: public
+insert_permissions:
+  - role: organizer
+    permission:
+      check:
+        id:
+          _eq: X-Hasura-User-Id
+      columns: []
+    comment: ""
+  - role: user
+    permission:
+      check:
+        id:
+          _eq: X-Hasura-User-Id
+      columns:
+        - email
+        - full_name
+        - id
+    comment: ""
+select_permissions:
+  - role: organizer
+    permission:
+      columns:
+        - email
+        - full_name
+        - id
+      filter: {}
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - created_at
+        - email
+        - full_name
+        - id
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+    comment: ""
+update_permissions:
+  - role: organizer
+    permission:
+      columns:
+        - full_name
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
+  - role: user
+    permission:
+      columns:
+        - full_name
+      filter:
+        id:
+          _eq: X-Hasura-User-Id
+      check: null
+    comment: ""
