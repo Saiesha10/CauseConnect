@@ -19,7 +19,7 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 | **Backend**                 | Hasura GraphQL Engine (connected to Postgres DB)  |
 | **Database**                | PostgreSQL (via Supabase)                         |
 | **Authentication**          | Firebase Authentication                           |
-| **Storage**                 | Supabase Storage (for profile pictures and media) |
+| **Storage**                 | Supabase Storage |
 | **Testing**                 | React Testing Library + Jest                      |
 | **Version Control / CI**    | Git & GitHub                                      |
 | **Migrations / Management** | Hasura CLI                                        |
@@ -58,7 +58,6 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 ## 🧠 Features Implemented
 
 ✅ Database schema for users, NGOs, events, donations, and favorites.
-✅ Profile picture support for both users and NGOs via Supabase Storage.
 ✅ Apollo Client setup with secure Hasura Cloud integration.
 ✅ Firebase Authentication (initial setup) for user.
 ✅ Role-based access control configured through Hasura Console.
