@@ -4,14 +4,12 @@
 **CauseConnect** is a web platform designed to bridge the gap between **NGOs, donors, and volunteers**.
 It enables users to explore NGOs, participate in events, donate, and manage causes seamlessly — powered by **React, Hasura GraphQL, Supabase, and Firebase Authentication**.
 
----
 
 ## 🚀 Project Overview
 
 CauseConnect connects people with social causes through a transparent and interactive platform.
 It provides role-based functionalities for users, organizers, and admins, allowing NGOs to host events, collect donations, and manage engagement efficiently.
 
----
 
 ## 🧩 Tech Stack
 
@@ -26,7 +24,6 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 | **Version Control / CI**    | Git & GitHub                                      |
 | **Migrations / Management** | Hasura CLI                                        |
 
----
 
 ## 🗂️ Database Schema
 
@@ -50,7 +47,6 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 
 * `id`, `user_id`, `ngo_id`, `created_at`, `UNIQUE(user_id, ngo_id)`
 
----
 
 ## 🔑 Roles and Permissions (via Hasura)
 
@@ -58,7 +54,6 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 * **Organizer:** Can manage NGOs and events they created.
 * **User:** Can view NGOs/events, make donations, and favorite NGOs.
 
----
 
 ## 🧠 Features Implemented
 
@@ -70,7 +65,6 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 ✅ Hasura CLI integrated for schema and migration management.
 ✅ Sample data added to all tables for frontend testing.
 
----
 
 ## ⚙️ Setup Instructions
 
@@ -104,8 +98,6 @@ VITE_FIREBASE_AUTH_DOMAIN=your-firebase-auth-domain
 npm run dev
 ```
 
----
-
 ## 🧪 Testing
 
 Run component and integration tests using React Testing Library:
@@ -114,7 +106,6 @@ Run component and integration tests using React Testing Library:
 npm test
 ```
 
----
 ## Project Structure
 ```
 CauseConnect/
@@ -140,7 +131,6 @@ CauseConnect/
 └── … other config files
 
 ```
----
 
 ## 📈 Progress Summary
 
@@ -151,8 +141,7 @@ CauseConnect/
 * Initialized **Firebase Authentication** for secure user login/signup.
 * Added **sample data** for testing and UI rendering.
 * Implemented **React Testing Library** for validating components.
-
----
+  
 
 ## 💡 Further Enhancements
 
@@ -161,5 +150,3 @@ CauseConnect/
 * NGO dashboard for analytics and donation management.
 * Real-time updates for donations and events using GraphQL.
 * Enhanced UI with Tailwind.
-
----
