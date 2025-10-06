@@ -58,10 +58,15 @@ It provides role-based functionalities for users, organizers, and admins, allowi
 ## 🧠 Features Implemented
 
 ✅ Database schema for users, NGOs, events, donations, and favorites.
+
 ✅ Apollo Client setup with secure Hasura Cloud integration.
+
 ✅ Firebase Authentication (initial setup) for user.
+
 ✅ Role-based access control configured through Hasura Console.
+
 ✅ Hasura CLI integrated for schema and migration management.
+
 ✅ Sample data added to all tables for frontend testing.
 
 
