@@ -1,13 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import client from "./apolloClient";
 import AuthPage from "./pages/AuthPage";
-import NGO_Listings from "./pages/NGO_Listings";
-import NGO_Details from "./pages/NGO_Details";
+import NGO_Listings from "./pages/NGO_Listings.jsx"; // exact file name
+import NGO_Details from "./pages/NGO_Details.jsx";     // exact file name
 import Navbar from "./components/Navbar";
 import { auth } from "./firebase-config";
-import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 
 // Protected Route
