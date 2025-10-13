@@ -7,7 +7,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   "https://srnqvdmvvywbtlhnxetu.supabase.co",
-  "YOUR_SUPABASE_ANON_KEY"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNybnF2ZG12dnl3YnRsaG54ZXR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzMTMyMjAsImV4cCI6MjA3NDg4OTIyMH0.Z4Li7Cnq7LqVVW9Kt-iNsj7pJtA-p5S7IEwrcS2KCoU"
 );
 
 function AuthPage() {
