@@ -2,6 +2,16 @@ version: 3
 endpoint: https://lasting-bream-91.hasura.app
 admin_secret: ZC0PR6tMt9NEGdeIeZgne25QpS0Lt65Nz5lp1Svy5CiSe3mlBGDKjlh0Q9cLHnRu
 metadata_directory: metadata
+
+databases:
+  - name: CauseConnect
+    configuration:
+      connection_info:
+        database_url: postgresql://postgres:CauseConnect1234%23@aws-1-ap-south-1.pooler.supabase.com:5432/postgres
+        pool_settings:
+          max_connections: 50
+          idle_timeout: 180
+
 actions:
   kind: synchronous
   handler_webhook_baseurl: http://localhost:3000
