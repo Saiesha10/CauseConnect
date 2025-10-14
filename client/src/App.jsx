@@ -3,8 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import client from "./apolloClient";
 import AuthPage from "./pages/AuthPage";
-import NGO_Listings from "./pages/NGO_Listings.jsx"; // exact file name
-import NGO_Details from "./pages/NGO_Details.jsx";     // exact file name
+import NGO_Listings from "./pages/NGO_Listings.jsx"; 
+import NGO_Details from "./pages/NGO_Details.jsx";     
 import Navbar from "./components/Navbar";
 import { auth } from "./firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
