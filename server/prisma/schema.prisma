@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model causes {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title         String
+  created_at    DateTime?       @default(now()) @db.Timestamptz(6)
+  notifications notifications[]
+}
+
+model donations {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  ngo_id     String    @db.Uuid
+  amount     Decimal   @db.Decimal
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  ngos       ngos      @relation(fields: [ngo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model event_volunteers {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  event_id      String    @db.Uuid
+  user_id       String    @db.Uuid
+  registered_at DateTime? @default(now()) @db.Timestamptz(6)
+  events        events    @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model events {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ngo_id            String             @db.Uuid
+  title             String
+  description       String?
+  event_date        DateTime?          @db.Timestamptz(6)
+  location          String?
+  volunteers_needed Int?
+  created_at        DateTime?          @default(now()) @db.Timestamptz(6)
+  event_volunteers  event_volunteers[]
+  ngos              ngos               @relation(fields: [ngo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model favorites {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  ngo_id     String    @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  ngos       ngos      @relation(fields: [ngo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ngos {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  cause         String?
+  description   String?
+  location      String?
+  contact_info  String?
+  donation_link String?
+  ngo_picture   String?
+  created_at    DateTime?   @default(now()) @db.Timestamptz(6)
+  created_by    String?     @db.Uuid
+  donations     donations[]
+  events        events[]
+  favorites     favorites[]
+  users         users?      @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model notifications {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  message    String
+  cause_id   String?   @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  causes     causes?   @relation(fields: [cause_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model test_ngos {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  cause      String?
+  location   String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model users {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String             @unique
+  full_name        String?
+  role             String             @default("user")
+  profile_picture  String?
+  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
+  donations        donations[]
+  event_volunteers event_volunteers[]
+  favorites        favorites[]
+  ngos             ngos[]
+  notifications    notifications[]
+}

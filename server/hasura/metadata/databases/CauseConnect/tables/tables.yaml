@@ -1,6 +1,0 @@
-- "!include public_donations.yaml"
-- "!include public_events.yaml"
-- "!include public_favorites.yaml"
-- "!include public_ngos.yaml"
-- "!include public_test_nogs.yaml"
-- "!include public_users.yaml"
