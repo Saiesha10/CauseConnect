@@ -1,0 +1,145 @@
+# ===========================
+# TYPES
+# ===========================
+
+type User {
+  id: ID!
+  email: String!
+  full_name: String
+  role: String
+  profile_picture: String
+  created_at: String
+  donations: [Donation]
+  favorites: [Favorite]
+  ngos: [NGO]
+  notifications: [Notification]
+  password: String
+}
+
+type AuthPayload {
+  user: User!
+  token: String!
+}
+
+type NGO {
+  id: ID!
+  name: String!
+  cause: String
+  description: String
+  location: String
+  contact_info: String
+  donation_link: String
+  ngo_picture: String
+  created_at: String
+  created_by: ID
+  donations: [Donation]
+  events: [Event]
+  favorites: [Favorite]
+}
+
+type Event {
+  id: ID!
+  ngo_id: ID!
+  title: String!
+  description: String
+  event_date: String
+  location: String
+  volunteers_needed: Int
+  created_at: String
+  volunteers: [EventVolunteer]
+}
+
+type EventVolunteer {
+  id: ID!
+  event_id: ID!
+  user_id: ID!
+  registered_at: String
+}
+
+type Donation {
+  id: ID!
+  user_id: ID!
+  ngo_id: ID!
+  amount: Float!
+  created_at: String
+  ngos: NGO
+}
+
+type Favorite {
+  id: ID!
+  user_id: ID!
+  ngo_id: ID!
+  created_at: String
+}
+
+type Notification {
+  id: ID!
+  user_id: ID!
+  message: String!
+  cause_id: ID
+  created_at: String
+  causes: NGO
+}
+
+# ===========================
+# QUERIES
+# ===========================
+
+type Query {
+  ngos: [NGO!]!
+  ngo(id: ID!): NGO
+  events: [Event]
+  userDonations: [Donation]
+  users: [User]
+  userFavorites: [Favorite]
+  userNotifications: [Notification]
+}
+
+
+type Mutation {
+  # AUTH
+  signUpUser(email: String!, password: String!, full_name: String, profile_picture: String, role: String): AuthPayload
+  loginUser(email: String!, password: String!): AuthPayload
+
+  # NGOs
+  createNGO(
+    name: String!
+    cause: String
+    description: String
+    location: String
+    contact_info: String
+    donation_link: String
+    ngo_picture: String
+    created_by: ID
+  ): NGO
+  deleteNGO(id: ID!): NGO
+
+  # Events
+  createEvent(
+    ngo_id: ID!
+    title: String!
+    description: String
+    event_date: String
+    location: String
+    volunteers_needed: Int
+  ): Event
+  deleteEvent(id: ID!): Event
+
+  # Volunteers
+  registerVolunteer(event_id: ID!, user_id: ID!): EventVolunteer
+  removeVolunteer(event_id: ID!, user_id: ID!): String
+
+  # Donations
+  donateToNGO( ngo_id: ID!, amount: Float!): Donation
+
+  # Favorites
+  addFavorite(user_id: ID!, ngo_id: ID!): Favorite
+  removeFavorite(user_id: ID!, ngo_id: ID!): String
+
+  # Notifications
+  createNotification(user_id: ID!, message: String!, cause_id: ID): Notification
+
+  # Users
+  updateUser(id: ID!, full_name: String, profile_picture: String): User
+  deleteUser(id: ID!): User
+}

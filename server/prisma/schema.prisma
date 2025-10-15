@@ -94,6 +94,7 @@ model test_ngos {
 model users {
   id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email            String             @unique
+  password         String
   full_name        String?
   role             String             @default("user")
   profile_picture  String?
