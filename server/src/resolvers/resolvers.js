@@ -1,4 +1,4 @@
-import { Query } from "./Query.js"; // if you already have queries
+import { Query } from "./Query.js";
 import { Mutation } from "./Mutation.js";
 
 export const resolvers = {

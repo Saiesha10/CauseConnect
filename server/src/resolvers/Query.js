@@ -3,9 +3,7 @@ import { PrismaClient } from "../../generated/prisma/index.js";
 const prisma = new PrismaClient();
 
 export const Query = {
-  // ========================
-  // NGOs
-  // ========================
+  
   ngos: async (_, __, { user }) => {
     try {
       if (!user) throw new Error("Not authenticated");
@@ -31,9 +29,7 @@ export const Query = {
     }
   },
 
-  // ========================
-  // EVENTS
-  // ========================
+
   events: async (_, __, { user }) => {
     try {
       if (!user) throw new Error("Not authenticated");
@@ -45,9 +41,7 @@ export const Query = {
     }
   },
 
-  // ========================
-  // USER DATA
-  // ========================
+
   userDonations: async (_, __, { user }) => {
     try {
       if (!user) throw new Error("Not authenticated");
@@ -84,9 +78,6 @@ export const Query = {
     }
   },
 
-  // ========================
-  // ADMIN / ORGANIZER ONLY
-  // ========================
   users: async (_, __, { user }) => {
     try {
       if (!user) throw new Error("Not authenticated");
