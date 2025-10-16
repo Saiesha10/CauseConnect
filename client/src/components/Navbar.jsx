@@ -29,7 +29,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Inline font import fallback */}
+    
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@600&display=swap');`}
       </style>
@@ -45,7 +45,6 @@ const Navbar = () => {
             backgroundColor: "transparent",
           }}
         >
-          {/* Logo + Brand */}
           <Box
             sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={() => navigate("/")}
@@ -64,7 +63,7 @@ const Navbar = () => {
               Causeconnect
               <span
                 style={{
-                  color: "#E76F51", // dark orange
+                  color: "#E76F51", 
                   fontSize: "1.5rem",
                   lineHeight: 0,
                   marginLeft: "3px",
@@ -75,7 +74,7 @@ const Navbar = () => {
             </Typography>
           </Box>
 
-          {/* Navigation Buttons */}
+          
           <Box sx={{ display: "flex", gap: 1 }}>
             <Button
               component={Link}
