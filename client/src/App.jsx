@@ -1,61 +1,62 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { ApolloProvider } from "@apollo/client";
-import client from "./apolloClient";
-import AuthPage from "./pages/AuthPage";
-import NGO_Listings from "./pages/NGO_Listings.jsx"; 
-import NGO_Details from "./pages/NGO_Details.jsx";     
+// client/src/App.jsx
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
-import { auth } from "./firebase-config";
-import { onAuthStateChanged } from "firebase/auth";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Home from "./pages/Home";
+import NGO_Listings from "./pages/NGO_Listings";
+import NGO_Details from "./pages/NGO_Details";
 
-// Protected Route
-function ProtectedRoute({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
-  return user ? children : <Navigate to="/" />;
-}
+// PrivateRoute protects pages that need authentication
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem("cc_token");
+  return token ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<AuthPage />} />
-          <Route
-            path="/ngos"
-            element={
-              <ProtectedRoute>
-                <NGO_Listings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/ngos/:id"
-            element={
-              <ProtectedRoute>
-                <NGO_Details />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="*"
-            element={<h1 className="text-2xl text-center mt-10">404 Not Found</h1>}
-          />
-        </Routes>
-      </div>
-    </ApolloProvider>
+    <Router>
+      <Navbar />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} /> {/* Home is public and first visible */}
+        <Route
+          path="/login"
+          element={
+            localStorage.getItem("cc_token") ? <Navigate to="/" /> : <Login />
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            localStorage.getItem("cc_token") ? <Navigate to="/" /> : <Signup />
+          }
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/ngos"
+          element={
+            <PrivateRoute>
+              <NGO_Listings />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ngos/:id"
+          element={
+            <PrivateRoute>
+              <NGO_Details />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Fallback Route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 }
 

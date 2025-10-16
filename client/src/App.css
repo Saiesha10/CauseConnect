@@ -1,42 +1,71 @@
+/* App.css - CauseConnect Tailwind optimized */
+
+/* Root container (optional max width) */
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
+/* Logo hover animation */
 .logo {
   height: 6em;
   padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+  will-change: filter, transform;
+  transition: filter 300ms, transform 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
+  transform: scale(1.05);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+/* Optional spin animation for logo or hero image */
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  .logo-spin {
     animation: logo-spin infinite 20s linear;
   }
 }
 
+/* Reusable card styling (can also use Tailwind @apply) */
 .card {
-  padding: 2em;
+  padding: 2rem;
+  border-radius: 1rem;
+  background-color: white;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.read-the-docs {
-  color: #888;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Button styling (optional) */
+.button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  background-color: #2563eb; /* Tailwind blue-600 */
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.button:hover {
+  background-color: #1d4ed8; /* Tailwind blue-700 */
+  transform: translateY(-1px);
+}
+
+/* Utility for text-muted/secondary */
+.text-muted {
+  color: #6b7280; /* Tailwind gray-500 */
 }

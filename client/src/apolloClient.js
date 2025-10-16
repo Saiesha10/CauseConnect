@@ -1,23 +1,24 @@
-// src/apolloClient.js
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 
+const GRAPHQL_HTTP = import.meta.env.VITE_GRAPHQL_HTTP || "http://localhost:4000/graphql";
+
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_HASURA_GRAPHQL_URL,
+  uri: GRAPHQL_HTTP,
 });
 
 const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem("cc_token")?.trim(); // ensure no extra spaces
   return {
     headers: {
       ...headers,
-      "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_SECRET,
+      Authorization: token ? `Bearer ${token}` : "", // uppercase 'Authorization' is standard
     },
   };
 });
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
-
-export default client;
+ export default client;

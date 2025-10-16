@@ -15,24 +15,27 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 const typeDefs = readFileSync(path.join(process.cwd(), "src/schema/schema.graphql"), "utf-8");
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({req})=>{
-    const authHeader=req.headers.authorization||"";
-    const token=authHeader.replace("Bearer","");
-    let user=null;
-    if (token){
-        try{
-            user=jwt.verify(token,process.env.JWT_SECRET);
-        }catch(err){
-            console.log("Invalid token:, err.message");
-        }
+  context: ({ req }) => {
+    let user = null;
+
+    const authHeader = req.headers.authorization || "";
+    if (authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1]; // get the actual token
+      try {
+        user = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        console.log("Invalid token:", err.message);
+      }
     }
-    return {prisma,user};
-  }, 
+
+    return { prisma, user };
+  },
 });
 
 async function startServer() {

@@ -11,6 +11,11 @@
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@fontsource/work-sans": "^5.2.8",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.4",
     "@supabase/supabase-js": "^2.75.0",
     "firebase": "^12.4.0",
     "graphql": "^16.11.0",

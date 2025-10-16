@@ -1,17 +1,22 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import './index.css';
-import App from './App.jsx';
-import { BrowserRouter } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/client';
-import client from './apolloClient'; // make sure path is correct
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { ApolloProvider } from "@apollo/client";
+import client from "./apolloClient";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { getTheme } from "./theme";
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
+const Root = () => {
+  const [mode, setMode] = useState("light"); // default
+
+  return (
     <ApolloProvider client={client}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ThemeProvider theme={getTheme(mode)}>
+        <CssBaseline />
+        <App mode={mode} setMode={setMode} />
+      </ThemeProvider>
     </ApolloProvider>
-  </StrictMode>
-);
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
