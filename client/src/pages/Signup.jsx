@@ -13,16 +13,19 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { uploadToCloudinary } from "../utils/cloudinary";
+
 
 const SIGNUP_MUTATION = gql`
-  mutation SignUpUser(
+  mutation signUpUser(
     $full_name: String!
     $email: String!
     $password: String!
     $profile_picture: String
     $role: String!
   ) {
-    signup(
+    signUpUser(
       full_name: $full_name
       email: $email
       password: $password
@@ -48,31 +51,46 @@ const Signup = ({ onSuccess }) => {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const [signup, { loading }] = useMutation(SIGNUP_MUTATION, {
+
+  const [signUpUser, { loading }] = useMutation(SIGNUP_MUTATION, {
     onCompleted: (data) => {
-      const token = data.signup.token;
-      localStorage.setItem("cc_token", token);
+      const token = data.signUpUser.token;
+      localStorage.setItem("cc_token", token); 
       if (onSuccess) onSuccess();
-      navigate("/ngos"); // Navigate to NGO listings after signup
+      navigate("/ngos"); 
     },
     onError: (error) => setErrorMsg(error.message),
   });
+  
+const handleImageUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfilePicture(imageUrl);
-    }
-  };
+  try {
+    const imageUrl = await uploadToCloudinary(file);
+console.log("Uploaded Image URL:", imageUrl);
+setProfilePicture(imageUrl);
+
+  } catch (err) {
+    console.error("Upload failed:", err);
+  }
+};
 
   const handleDeleteImage = () => {
     setProfilePicture("");
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    signup({
+    setErrorMsg("");
+
+    if (!role) {
+      setErrorMsg("Please select a role before signing up.");
+      return;
+    }
+
+    signUpUser({
       variables: { full_name, email, password, profile_picture, role },
     });
   };

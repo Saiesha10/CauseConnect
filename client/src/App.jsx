@@ -45,7 +45,7 @@ function App() {
           }
         />
         <Route
-          path="/ngos/:id"
+          path="/ngo/:id"
           element={
             <PrivateRoute>
               <NGO_Details />

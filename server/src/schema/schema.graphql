@@ -4,7 +4,7 @@ type User {
   id: ID!
   email: String!
   full_name: String
-  role: String
+  role: String!
   profile_picture: String
   created_at: String
   donations: [Donation]
@@ -19,7 +19,7 @@ type AuthPayload {
   token: String!
 }
 
-type NGO {
+type ngo {
   id: ID!
   name: String!
   cause: String
@@ -89,6 +89,7 @@ type Query {
   users: [User]
   userFavorites: [Favorite]
   userNotifications: [Notification]
+  user(id: ID!): User
 }
 
 
