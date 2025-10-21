@@ -70,14 +70,10 @@ const Navbar = () => {
 
   return (
     <>
-<<<<<<< HEAD
-=======
-    
       <style>
         {`@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@600&display=swap');`}
       </style>
 
->>>>>>> 5e0bbb16b8e9c3d40ceb40bebc491ed02a190a62
       <StyledAppBar>
         <Toolbar
           sx={{
@@ -88,14 +84,11 @@ const Navbar = () => {
             py: 1,
           }}
         >
-<<<<<<< HEAD
-          <Box sx={{ display: "flex", alignItems: "center", cursor: "pointer" }} onClick={() => navigate("/")}>
-=======
+          
           <Box
             sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={() => navigate("/")}
           >
->>>>>>> 5e0bbb16b8e9c3d40ceb40bebc491ed02a190a62
             <Typography
               variant="h5"
               sx={{
@@ -105,20 +98,11 @@ const Navbar = () => {
                 color: "#0B0C10",
               }}
             >
-              Causeconnect
-<<<<<<< HEAD
-              <span style={{ color: "#E76F51", fontSize: "1.6rem", marginLeft: "3px" }}>.</span>
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 1.5 }}>
-            <Button component={Link} to="/" variant="contained" sx={navButtonStyle}>
-=======
+              CauseConnect
               <span
                 style={{
-                  color: "#E76F51", 
-                  fontSize: "1.5rem",
-                  lineHeight: 0,
+                  color: "#E76F51",
+                  fontSize: "1.6rem",
                   marginLeft: "3px",
                 }}
               >
@@ -128,23 +112,8 @@ const Navbar = () => {
           </Box>
 
           
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              component={Link}
-              to="/"
-              variant="conatined"
-              sx={{
-                backgroundColor: "#E76F51",
-                    color: "#fff",
-                    fontWeight: 800,
-                    textTransform: "none",
-                    fontFamily: "'Work Sans', sans-serif",
-                    mr: 1,
-                    borderRadius: "8px",
-                    "&:hover": { backgroundColor: "#D65A3C" },
-              }}
-            >
->>>>>>> 5e0bbb16b8e9c3d40ceb40bebc491ed02a190a62
+          <Box sx={{ display: "flex", gap: 1.5 }}>
+            <Button component={Link} to="/" variant="contained" sx={navButtonStyle}>
               Home
             </Button>
 

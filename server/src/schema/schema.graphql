@@ -1,5 +1,3 @@
-
-
 type User {
   id: ID!
   email: String!
@@ -19,7 +17,7 @@ type AuthPayload {
   token: String!
 }
 
-type ngo {
+type NGO {
   id: ID!
   name: String!
   cause: String
@@ -60,7 +58,7 @@ type Donation {
   ngo_id: ID!
   amount: Float!
   created_at: String
-  ngos: NGO
+  ngo: NGO
 }
 
 type Favorite {
@@ -76,10 +74,8 @@ type Notification {
   message: String!
   cause_id: ID
   created_at: String
-  causes: NGO
+  cause: NGO
 }
-
-
 
 type Query {
   ngos: [NGO!]!
@@ -92,10 +88,16 @@ type Query {
   user(id: ID!): User
 }
 
-
 type Mutation {
   # AUTH
-  signUpUser(email: String!, password: String!, full_name: String, profile_picture: String, role: String): AuthPayload
+  signUpUser(
+    email: String!
+    password: String!
+    full_name: String
+    profile_picture: String
+    role: String
+  ): AuthPayload
+
   loginUser(email: String!, password: String!): AuthPayload
 
   # NGOs
@@ -109,6 +111,7 @@ type Mutation {
     ngo_picture: String
     created_by: ID
   ): NGO
+
   deleteNGO(id: ID!): NGO
 
   # Events
@@ -120,6 +123,7 @@ type Mutation {
     location: String
     volunteers_needed: Int
   ): Event
+
   deleteEvent(id: ID!): Event
 
   # Volunteers
@@ -127,7 +131,7 @@ type Mutation {
   removeVolunteer(event_id: ID!, user_id: ID!): String
 
   # Donations
-  donateToNGO( ngo_id: ID!, amount: Float!): Donation
+  donateToNGO(ngo_id: ID!, amount: Float!): Donation
 
   # Favorites
   addFavorite(user_id: ID!, ngo_id: ID!): Favorite
