@@ -1,5 +1,4 @@
 import { PrismaClient } from "../../generated/prisma/index.js";
-import { validate as isUUID } from "uuid";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -20,9 +19,11 @@ export const Mutation = {
       data: { email, full_name, password: hashedPassword, profile_picture, role: role || "user" },
     });
 
-    const token = jwt.sign({ userId: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: newUser.id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     return { user: newUser, token };
   },
@@ -34,97 +35,85 @@ export const Mutation = {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) throw new Error("Incorrect password");
 
-    const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
     return { user, token };
   },
 
-  async createNGO(_, { name, cause, description, location, contact_info, donation_link, ngo_picture }, { user }) {
+  async createNGO(_, args, { user }) {
     if (!user) throw new Error("Not authenticated");
     if (user.role !== "organizer") throw new Error("Only organizers can create NGOs");
 
     return prisma.ngos.create({
-      data: { name, cause, description, location, contact_info, donation_link, ngo_picture, created_by: user.userId },
+      data: { ...args, created_by: user.userId },
+    });
+  },
+
+  async updateNGO(_, args, { user }) {
+    if (!user) throw new Error("Not authenticated");
+
+    const existingNGO = await prisma.ngos.findUnique({ where: { id: args.id } });
+    if (!existingNGO) throw new Error("NGO not found");
+
+    if (existingNGO.created_by !== user.userId) throw new Error("Not authorized");
+
+    return prisma.ngos.update({
+      where: { id: args.id },
+      data: {
+        name: args.name ?? undefined,
+        cause: args.cause ?? undefined,
+        description: args.description ?? undefined,
+        location: args.location ?? undefined,
+        contact_info: args.contact_info ?? undefined,
+        donation_link: args.donation_link ?? undefined,
+        ngo_picture: args.ngo_picture ?? undefined,
+      },
     });
   },
 
   async deleteNGO(_, { id }, { user }) {
     if (!user) throw new Error("Not authenticated");
+
     const ngo = await prisma.ngos.findUnique({ where: { id } });
     if (!ngo) throw new Error("NGO not found");
-    if (user.role !== "organizer" || ngo.created_by !== user.userId) throw new Error("Not authorized");
+    if (ngo.created_by !== user.userId || user.role !== "organizer") throw new Error("Not authorized");
 
     await prisma.donations.deleteMany({ where: { ngo_id: id } });
     await prisma.events.deleteMany({ where: { ngo_id: id } });
     await prisma.favorites.deleteMany({ where: { ngo_id: id } });
+
     return prisma.ngos.delete({ where: { id } });
   },
 
-  async createEvent(_, { ngo_id, title, description, event_date, location, volunteers_needed }, { user }) {
+  // Other mutations (createEvent, deleteEvent, etc.) – update user ID check to use `user.userId`
+  async createEvent(_, { ngo_id, ...rest }, { user }) {
     if (!user) throw new Error("Not authenticated");
     const ngo = await prisma.ngos.findUnique({ where: { id: ngo_id } });
     if (!ngo) throw new Error("NGO not found");
-    if (user.role !== "organizer" || ngo.created_by !== user.userId) throw new Error("Not authorized");
+    if (ngo.created_by !== user.userId || user.role !== "organizer") throw new Error("Not authorized");
 
-    return prisma.events.create({
-      data: { ngo_id, title, description, event_date, location, volunteers_needed },
-    });
+    return prisma.events.create({ data: { ngo_id, ...rest } });
   },
 
   async deleteEvent(_, { id }, { user }) {
     if (!user) throw new Error("Not authenticated");
     const event = await prisma.events.findUnique({ where: { id } });
     const ngo = await prisma.ngos.findUnique({ where: { id: event.ngo_id } });
-    if (user.role !== "organizer" || ngo.created_by !== user.userId) throw new Error("Not authorized");
+    if (!event) throw new Error("Event not found");
+    if (!ngo || ngo.created_by !== user.userId || user.role !== "organizer") throw new Error("Not authorized");
 
     await prisma.event_volunteers.deleteMany({ where: { event_id: id } });
     return prisma.events.delete({ where: { id } });
   },
 
-
-  async registerVolunteer(_, { event_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    return prisma.event_volunteers.create({ data: { event_id, user_id: user.userId } });
-  },
-
-  async removeVolunteer(_, { event_id, user_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    // Only the organizer of the NGO can remove volunteers
-    const event = await prisma.events.findUnique({ where: { id: event_id } });
-    const ngo = await prisma.ngos.findUnique({ where: { id: event.ngo_id } });
-    if (user.role !== "organizer" || ngo.created_by !== user.userId) throw new Error("Not authorized");
-
-    await prisma.event_volunteers.deleteMany({ where: { event_id, user_id } });
-    return "Volunteer removed successfully";
-  },
-
-  async donateToNGO(_, { ngo_id, amount }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    return prisma.donations.create({ data: { user_id: user.userId, ngo_id, amount } });
-  },
-
-  async addFavorite(_, { ngo_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    return prisma.favorites.create({ data: { user_id: user.userId, ngo_id } });
-  },
-
-  async removeFavorite(_, { ngo_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    await prisma.favorites.deleteMany({ where: { user_id: user.userId, ngo_id } });
-    return "Favorite removed successfully";
-  },
-
-  async createNotification(_, { message, cause_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
-    return prisma.notifications.create({ data: { user_id: user.userId, message, cause_id } });
-  },
-
-
-  async updateUser(_, { id, full_name, profile_picture }, { user }) {
+  // Other user-related and volunteer-related mutations should also use user.userId
+  async updateUser(_, { id, ...rest }, { user }) {
     if (!user || user.userId !== id) throw new Error("Not authorized");
-    return prisma.users.update({ where: { id }, data: { full_name, profile_picture } });
+    return prisma.users.update({ where: { id }, data: { ...rest } });
   },
 
   async deleteUser(_, { id }, { user }) {

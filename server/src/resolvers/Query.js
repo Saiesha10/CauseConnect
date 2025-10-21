@@ -115,4 +115,70 @@ export const Query = {
       throw new Error(err.message);
     }
   },
+  // server/resolvers/Query.js (add these to your existing Query object)
+
+// Get NGOs created by the organizer
+organizerNGOs: async (_, __, { user }) => {
+  try {
+    if (!user) throw new Error("Not authenticated");
+    if (user.role !== "organizer") throw new Error("Not authorized");
+
+    return prisma.ngos.findMany({
+      where: { created_by: user.userId },
+      include: { donations: true, events: true, favorites: true },
+      orderBy: { created_at: "desc" },
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+},
+
+// Get events for organizer’s NGOs
+organizerEvents: async (_, __, { user }) => {
+  try {
+    if (!user) throw new Error("Not authenticated");
+    if (user.role !== "organizer") throw new Error("Not authorized");
+
+    return prisma.events.findMany({
+      where: { ngo: { created_by: user.userId } },
+      include: { volunteers: true },
+      orderBy: { created_at: "desc" },
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+},
+
+// Get donations to organizer’s NGOs
+organizerDonations: async (_, __, { user }) => {
+  try {
+    if (!user) throw new Error("Not authenticated");
+    if (user.role !== "organizer") throw new Error("Not authorized");
+
+    return prisma.donations.findMany({
+      where: { ngos: { created_by: user.userId } },
+      include: { ngos: true, user: true },
+      orderBy: { created_at: "desc" },
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+},
+
+// Get volunteers for organizer’s events
+organizerVolunteers: async (_, __, { user }) => {
+  try {
+    if (!user) throw new Error("Not authenticated");
+    if (user.role !== "organizer") throw new Error("Not authorized");
+
+    return prisma.eventVolunteers.findMany({
+      where: { event: { ngo: { created_by: user.userId } } },
+      include: { event: true, user: true },
+      orderBy: { registered_at: "desc" },
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+},
+
 };

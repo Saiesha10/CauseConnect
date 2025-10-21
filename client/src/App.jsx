@@ -1,4 +1,4 @@
-// client/src/App.jsx
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
@@ -8,34 +8,60 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import NGO_Listings from "./pages/NGO_Listings";
 import NGO_Details from "./pages/NGO_Details";
+import Add_NGO from "./pages/Add_NGO";
+import Dashboard from "./Dashboard/Dashboard";
 
-// PrivateRoute protects pages that need authentication
+
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("cc_token");
   return token ? children : <Navigate to="/login" />;
 };
 
+const OrganizerRoute = ({ children }) => {
+  const token = localStorage.getItem("cc_token");
+  if (!token) return <Navigate to="/login" />;
+
+  let role = null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    role = payload.role;
+  } catch (err) {
+    console.error("Invalid token:", err);
+    return <Navigate to="/login" />;
+  }
+
+  return role === "organizer" ? children : <Navigate to="/" />;
+};
+
 function App() {
+  const token = localStorage.getItem("cc_token");
+  let userRole = null;
+
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userRole = payload.role;
+    } catch (err) {
+      console.error("Invalid token:", err);
+    }
+  }
+
   return (
     <Router>
       <Navbar />
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} /> {/* Home is public and first visible */}
+      
+        <Route path="/" element={<Home />} />
         <Route
           path="/login"
-          element={
-            localStorage.getItem("cc_token") ? <Navigate to="/" /> : <Login />
-          }
+          element={token ? <Navigate to="/" /> : <Login />}
         />
         <Route
           path="/signup"
-          element={
-            localStorage.getItem("cc_token") ? <Navigate to="/" /> : <Signup />
-          }
+          element={token ? <Navigate to="/" /> : <Signup />}
         />
 
-        {/* Protected Routes */}
+       
         <Route
           path="/ngos"
           element={
@@ -53,7 +79,35 @@ function App() {
           }
         />
 
-        {/* Fallback Route */}
+       
+        <Route
+          path="/add-ngo"
+          element={
+            <OrganizerRoute>
+              <Add_NGO />
+            </OrganizerRoute>
+          }
+        />
+        <Route
+          path="/edit-ngo/:id"
+          element={
+            <OrganizerRoute>
+              <Add_NGO />
+            </OrganizerRoute>
+          }
+        />
+
+     
+        <Route
+          path="/dashboard/*"
+          element={
+            <PrivateRoute>
+              <Dashboard role={userRole} />
+            </PrivateRoute>
+          }
+        />
+
+       
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

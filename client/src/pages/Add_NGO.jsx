@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import React, { useState, useEffect } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Box,
   TextField,
@@ -9,8 +9,9 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { uploadToCloudinary } from "../utils/cloudinary";
+
 
 const CREATE_NGO = gql`
   mutation createNGO(
@@ -35,55 +36,141 @@ const CREATE_NGO = gql`
       name
       cause
       description
+      location
+      contact_info
+      donation_link
+      ngo_picture
+    }
+  }
+`;
+
+const UPDATE_NGO = gql`
+  mutation updateNGO(
+    $id: ID!
+    $name: String
+    $cause: String
+    $description: String
+    $location: String
+    $contact_info: String
+    $donation_link: String
+    $ngo_picture: String
+  ) {
+    updateNGO(
+      id: $id
+      name: $name
+      cause: $cause
+      description: $description
+      location: $location
+      contact_info: $contact_info
+      donation_link: $donation_link
+      ngo_picture: $ngo_picture
+    ) {
+      id
+      name
+      cause
+      description
+      location
+      contact_info
+      donation_link
+      ngo_picture
+    }
+  }
+`;
+
+
+const GET_NGO_BY_ID = gql`
+  query ngo($id: ID!) {
+    ngo(id: $id) {
+      id
+      name
+      cause
+      description
+      location
+      contact_info
+      donation_link
       ngo_picture
     }
   }
 `;
 
 const Add_NGO = () => {
-  const [name, setName] = useState("");
-  const [cause, setCause] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [contactInfo, setContactInfo] = useState("");
-  const [donationLink, setDonationLink] = useState("");
-  const [ngoPicture, setNgoPicture] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const { id } = useParams(); 
+  const isEditing = Boolean(id);
 
+  const [formData, setFormData] = useState({
+    name: "",
+    cause: "",
+    description: "",
+    location: "",
+    contact_info: "",
+    donation_link: "",
+    ngo_picture: "",
+  });
+
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const [createNGO, { loading }] = useMutation(CREATE_NGO, {
-    onCompleted: (data) => {
-      navigate(`/ngo/${data.createNGO.id}`);
-    },
+
+  const { data: ngoData, loading: loadingNGO } = useQuery(GET_NGO_BY_ID, {
+    variables: { id },
+    skip: !isEditing,
+  });
+
+  useEffect(() => {
+    if (ngoData?.ngo) {
+      setFormData({
+        name: ngoData.ngo.name,
+        cause: ngoData.ngo.cause,
+        description: ngoData.ngo.description,
+        location: ngoData.ngo.location,
+        contact_info: ngoData.ngo.contact_info || "",
+        donation_link: ngoData.ngo.donation_link || "",
+        ngo_picture: ngoData.ngo.ngo_picture || "",
+      });
+    }
+  }, [ngoData]);
+
+  const [createNGO, { loading: creating }] = useMutation(CREATE_NGO, {
+    onCompleted: (data) => navigate(`/ngo/${data.createNGO.id}`),
     onError: (err) => setErrorMsg(err.message),
   });
+
+  const [updateNGO, { loading: updating }] = useMutation(UPDATE_NGO, {
+    onCompleted: (data) => navigate(`/ngo/${data.updateNGO.id}`),
+    onError: (err) => setErrorMsg(err.message),
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     try {
       const url = await uploadToCloudinary(file);
-      setNgoPicture(url);
+      setFormData((prev) => ({ ...prev, ngo_picture: url }));
     } catch (err) {
       console.error(err);
+      setErrorMsg("Failed to upload image.");
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createNGO({
-      variables: {
-        name,
-        cause,
-        description,
-        location,
-        contact_info: contactInfo,
-        donation_link: donationLink,
-        ngo_picture: ngoPicture,
-      },
-    });
+    if (isEditing) {
+      updateNGO({ variables: { id, ...formData } });
+    } else {
+      createNGO({ variables: formData });
+    }
   };
+
+  if (loadingNGO)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <Box
@@ -114,7 +201,7 @@ const Add_NGO = () => {
             textAlign: "center",
           }}
         >
-          Add New NGO
+          {isEditing ? "Edit NGO Details" : "Add New NGO"}
         </Typography>
 
         {errorMsg && (
@@ -124,54 +211,29 @@ const Add_NGO = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="NGO Name"
-            margin="dense"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <TextField
-            fullWidth
-            label="Cause"
-            margin="dense"
-            value={cause}
-            onChange={(e) => setCause(e.target.value)}
-            required
-          />
-          <TextField
-            fullWidth
-            label="Description"
-            margin="dense"
-            multiline
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-          <TextField
-            fullWidth
-            label="Location"
-            margin="dense"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            required
-          />
-          <TextField
-            fullWidth
-            label="Contact Info"
-            margin="dense"
-            value={contactInfo}
-            onChange={(e) => setContactInfo(e.target.value)}
-          />
-          <TextField
-            fullWidth
-            label="Donation Link"
-            margin="dense"
-            value={donationLink}
-            onChange={(e) => setDonationLink(e.target.value)}
-          />
+          {[
+            { label: "NGO Name", name: "name", required: true },
+            { label: "Cause", name: "cause", required: true },
+            {
+              label: "Description",
+              name: "description",
+              multiline: true,
+              rows: 3,
+              required: true,
+            },
+            { label: "Location", name: "location", required: true },
+            { label: "Contact Info", name: "contact_info" },
+            { label: "Donation Link", name: "donation_link" },
+          ].map((field) => (
+            <TextField
+              key={field.name}
+              fullWidth
+              margin="dense"
+              {...field}
+              value={formData[field.name]}
+              onChange={handleChange}
+            />
+          ))}
 
           <Button
             variant="contained"
@@ -187,13 +249,13 @@ const Add_NGO = () => {
             <input type="file" hidden onChange={handleImageUpload} />
           </Button>
 
-          {ngoPicture && (
+          {formData.ngo_picture && (
             <Typography
               variant="body2"
               mt={1}
               sx={{ color: "#333", wordBreak: "break-all" }}
             >
-              Uploaded: {ngoPicture}
+              Uploaded: {formData.ngo_picture}
             </Typography>
           )}
 
@@ -209,9 +271,15 @@ const Add_NGO = () => {
               fontFamily: "'Work Sans', sans-serif",
               "&:hover": { backgroundColor: "#D65A3C" },
             }}
-            disabled={loading}
+            disabled={creating || updating}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Add NGO"}
+            {(creating || updating) ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : isEditing ? (
+              "Update NGO"
+            ) : (
+              "Add NGO"
+            )}
           </Button>
         </form>
       </Paper>

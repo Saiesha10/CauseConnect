@@ -1,7 +1,16 @@
+# ----------------------------------------------
+# CauseConnect GraphQL Schema
+# ----------------------------------------------
+
+# -------------------------
+# Types
+# -------------------------
+
 type User {
   id: ID!
+  full_name: String!
   email: String!
-  full_name: String
+  password: String
   role: String!
   profile_picture: String
   created_at: String
@@ -9,12 +18,7 @@ type User {
   favorites: [Favorite]
   ngos: [NGO]
   notifications: [Notification]
-  password: String
-}
-
-type AuthPayload {
-  user: User!
-  token: String!
+  volunteer_events: [EventVolunteer]
 }
 
 type NGO {
@@ -26,81 +30,113 @@ type NGO {
   contact_info: String
   donation_link: String
   ngo_picture: String
+  created_by: ID!
   created_at: String
-  created_by: ID
-  donations: [Donation]
   events: [Event]
+  donations: [Donation]
   favorites: [Favorite]
 }
 
 type Event {
   id: ID!
-  ngo_id: ID!
   title: String!
   description: String
   event_date: String
   location: String
   volunteers_needed: Int
-  created_at: String
+  ngo_id: ID!
+  ngo: NGO
   volunteers: [EventVolunteer]
-}
-
-type EventVolunteer {
-  id: ID!
-  event_id: ID!
-  user_id: ID!
-  registered_at: String
+  created_at: String
 }
 
 type Donation {
   id: ID!
+  amount: Float!
+  message: String
   user_id: ID!
   ngo_id: ID!
-  amount: Float!
-  created_at: String
+  user: User
   ngo: NGO
+  created_at: String
 }
 
 type Favorite {
   id: ID!
   user_id: ID!
   ngo_id: ID!
-  created_at: String
+  user: User
+  ngo: NGO
 }
 
 type Notification {
   id: ID!
-  user_id: ID!
   message: String!
+  user_id: ID!
+  user: User
   cause_id: ID
   created_at: String
-  cause: NGO
 }
+
+type EventVolunteer {
+  id: ID!
+  user_id: ID!
+  event_id: ID!
+  registered_at: String
+  event: Event
+  user: User
+}
+
+# -------------------------
+# Auth Type
+# -------------------------
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+# -------------------------
+# Queries
+# -------------------------
 
 type Query {
-  ngos: [NGO!]!
+  # General
+  ngos: [NGO]
   ngo(id: ID!): NGO
   events: [Event]
-  userDonations: [Donation]
   users: [User]
+  user(id: ID!): User
+
+  # Logged-in user
+  userDonations: [Donation]
   userFavorites: [Favorite]
   userNotifications: [Notification]
-  user(id: ID!): User
+
+  # Organizer-specific
+  organizerNGOs: [NGO]
+  organizerEvents: [Event]
+  organizerDonations: [Donation]
+  organizerVolunteers: [EventVolunteer]
 }
 
+# -------------------------
+# Mutations
+# -------------------------
+
 type Mutation {
-  # AUTH
+  # Authentication
   signUpUser(
     email: String!
+    full_name: String!
     password: String!
-    full_name: String
     profile_picture: String
-    role: String
+    role: String!
   ): AuthPayload
 
   loginUser(email: String!, password: String!): AuthPayload
 
-  # NGOs
+  # NGO
   createNGO(
     name: String!
     cause: String
@@ -109,7 +145,17 @@ type Mutation {
     contact_info: String
     donation_link: String
     ngo_picture: String
-    created_by: ID
+  ): NGO
+
+  updateNGO(
+    id: ID!
+    name: String
+    cause: String
+    description: String
+    location: String
+    contact_info: String
+    donation_link: String
+    ngo_picture: String
   ): NGO
 
   deleteNGO(id: ID!): NGO
@@ -126,21 +172,21 @@ type Mutation {
 
   deleteEvent(id: ID!): Event
 
-  # Volunteers
-  registerVolunteer(event_id: ID!, user_id: ID!): EventVolunteer
-  removeVolunteer(event_id: ID!, user_id: ID!): String
-
   # Donations
-  donateToNGO(ngo_id: ID!, amount: Float!): Donation
+  donateToNGO(ngo_id: ID!, amount: Float!, message: String): Donation
 
   # Favorites
-  addFavorite(user_id: ID!, ngo_id: ID!): Favorite
-  removeFavorite(user_id: ID!, ngo_id: ID!): String
+  addFavorite(ngo_id: ID!): Favorite
+  removeFavorite(ngo_id: ID!): String
+
+  # Volunteers
+  registerVolunteer(event_id: ID!): EventVolunteer
+  removeVolunteer(event_id: ID!, user_id: ID!): String
 
   # Notifications
-  createNotification(user_id: ID!, message: String!, cause_id: ID): Notification
+  createNotification(message: String!, cause_id: ID): Notification
 
-  # Users
+  # User
   updateUser(id: ID!, full_name: String, profile_picture: String): User
   deleteUser(id: ID!): User
 }

@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx
+
 import React from "react";
 import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
@@ -84,7 +84,6 @@ const Navbar = () => {
             py: 1,
           }}
         >
-          
           <Box
             sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
             onClick={() => navigate("/")}
@@ -111,7 +110,6 @@ const Navbar = () => {
             </Typography>
           </Box>
 
-          
           <Box sx={{ display: "flex", gap: 1.5 }}>
             <Button component={Link} to="/" variant="contained" sx={navButtonStyle}>
               Home
@@ -123,6 +121,14 @@ const Navbar = () => {
               </Button>
             )}
 
+      
+            {token && !loading && (
+              <Button component={Link} to="/dashboard" variant="contained" sx={navButtonStyle}>
+                Dashboard
+              </Button>
+            )}
+
+      
             {token && role === "organizer" && !loading && (
               <Button component={Link} to="/add-ngo" variant="contained" sx={navButtonStyle}>
                 Add NGO
