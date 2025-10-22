@@ -9,6 +9,7 @@ import {
   CircularProgress,
   Avatar,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { uploadToCloudinary } from "../utils/cloudinary";
 
 const GET_ORGANIZER_NGOS = gql`
@@ -25,7 +26,6 @@ const GET_ORGANIZER_NGOS = gql`
     }
   }
 `;
-
 
 const UPDATE_NGO = gql`
   mutation updateNGO(
@@ -58,6 +58,7 @@ const UPDATE_NGO = gql`
 `;
 
 const NGOList = () => {
+  const navigate = useNavigate();
   const { data, loading, refetch } = useQuery(GET_ORGANIZER_NGOS);
   const [updateNGO, { loading: updating }] = useMutation(UPDATE_NGO, {
     onCompleted: () => {
@@ -97,6 +98,7 @@ const NGOList = () => {
       setFormData((prev) => ({ ...prev, ngo_picture: url }));
     } catch (err) {
       console.error(err);
+      alert("Image upload failed!");
     }
   };
 
@@ -117,7 +119,13 @@ const NGOList = () => {
         <Paper
           key={ngo.id}
           elevation={3}
-          sx={{ p: 3, mb: 3, borderRadius: 3, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
+          sx={{
+            p: 3,
+            mb: 3,
+            borderRadius: 3,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            bgcolor: "#fff",
+          }}
         >
           {editingId === ngo.id ? (
             <>
@@ -208,7 +216,13 @@ const NGOList = () => {
               <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
                 <Avatar
                   src={ngo.ngo_picture}
-                  sx={{ width: 80, height: 80, mr: 2, bgcolor: "#FFE5D9", border: "2px solid #E76F51" }}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    mr: 2,
+                    bgcolor: "#FFE5D9",
+                    border: "2px solid #E76F51",
+                  }}
                 />
                 <Typography variant="h6">{ngo.name}</Typography>
               </Box>
@@ -218,13 +232,24 @@ const NGOList = () => {
               <Typography variant="body2" sx={{ mb: 1 }}>
                 {ngo.description}
               </Typography>
-              <Button
-                variant="contained"
-                sx={{ backgroundColor: "#E76F51", mt: 1 }}
-                onClick={() => handleEditClick(ngo)}
-              >
-                Edit
-              </Button>
+
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                <Button
+                  variant="contained"
+                  sx={{ backgroundColor: "#E76F51" }}
+                  onClick={() => handleEditClick(ngo)}
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  sx={{ borderColor: "#E76F51", color: "#E76F51" }}
+                  onClick={() => navigate(`/dashboard/events/create/${ngo.id}`)}
+                >
+                  Create Event
+                </Button>
+              </Box>
             </>
           )}
         </Paper>

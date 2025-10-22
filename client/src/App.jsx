@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
@@ -10,7 +9,7 @@ import NGO_Listings from "./pages/NGO_Listings";
 import NGO_Details from "./pages/NGO_Details";
 import Add_NGO from "./pages/Add_NGO";
 import Dashboard from "./Dashboard/Dashboard";
-
+import CreateEvent from "./pages/CreateEvent";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("cc_token");
@@ -35,12 +34,12 @@ const OrganizerRoute = ({ children }) => {
 
 function App() {
   const token = localStorage.getItem("cc_token");
-  let userRole = null;
+  let user = null;
 
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      userRole = payload.role;
+      user = payload; 
     } catch (err) {
       console.error("Invalid token:", err);
     }
@@ -50,7 +49,6 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-      
         <Route path="/" element={<Home />} />
         <Route
           path="/login"
@@ -60,8 +58,6 @@ function App() {
           path="/signup"
           element={token ? <Navigate to="/" /> : <Signup />}
         />
-
-       
         <Route
           path="/ngos"
           element={
@@ -74,12 +70,11 @@ function App() {
           path="/ngo/:id"
           element={
             <PrivateRoute>
-              <NGO_Details />
+              
+              <NGO_Details user={user} />
             </PrivateRoute>
           }
         />
-
-       
         <Route
           path="/add-ngo"
           element={
@@ -96,18 +91,18 @@ function App() {
             </OrganizerRoute>
           }
         />
-
-     
         <Route
           path="/dashboard/*"
           element={
             <PrivateRoute>
-              <Dashboard role={userRole} />
+              <Dashboard role={user?.role} />
             </PrivateRoute>
           }
         />
-
-       
+        <Route
+          path="/dashboard/events/create/:ngoId"
+          element={<CreateEvent />}
+        />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
