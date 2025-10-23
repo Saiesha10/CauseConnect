@@ -124,6 +124,30 @@ export const Mutation = {
     include: { ngo: true, volunteers: true },
   });
 },
+async updateEvent(_, args, { user }) {
+  if (!user) throw new Error("Not authenticated");
+  if (user.role !== "organizer") throw new Error("Only organizers can update events");
+
+  const { id, title, description, event_date, location, volunteers_needed } = args;
+
+
+  const existingEvent = await prisma.Event.findUnique({ where: { id } });
+  if (!existingEvent) throw new Error("Event not found");
+
+  
+  return prisma.Event.update({
+    where: { id },
+    data: {
+      title: title !== undefined ? title : existingEvent.title,
+      description: description !== undefined ? description : existingEvent.description,
+      event_date: event_date !== undefined ? new Date(event_date) : existingEvent.event_date,
+      location: location !== undefined ? location : existingEvent.location,
+      volunteers_needed: volunteers_needed !== undefined ? volunteers_needed : existingEvent.volunteers_needed,
+    },
+    include: { ngo: true, volunteers: true },
+  });
+},
+
   async deleteEvent(_, { id }, { user }) {
     if (!user) throw new Error("Not authenticated");
 
@@ -149,52 +173,37 @@ export const Mutation = {
     return prisma.Favorite.create({ data: { ngo_id, user_id: user.userId } });
   },
 
-  async removeFavorite(_, { ngo_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
+  async registerVolunteer(_, { event_id }, { prisma, user }) {
+  if (!event_id) throw new Error("Event ID is required");
+  if (!user) throw new Error("Not authenticated"); // now user will always exist
 
-    await prisma.Favorite.deleteMany({ where: { ngo_id, user_id: user.userId } });
-    return "Favorite removed";
-  },
-
-  async registerVolunteer(_, { eventId }, { user, prisma }) {
-  if (!user) throw new Error("Not authenticated");
-
-  if (user.role !== "user" && user.role !== "organizer") {
-    throw new Error("Only registered users or organizers can volunteer");
-  }
-
-
-  const event = await prisma.event.findUnique({
-    where: { id: eventId },
+  const event = await prisma.Event.findUnique({
+    where: { id: event_id },
     include: { volunteers: true },
   });
 
   if (!event) throw new Error("Event not found");
 
-
   const alreadyRegistered = event.volunteers.some(v => v.user_id === user.id);
-  if (alreadyRegistered) throw new Error("Already registered for this event");
+  if (alreadyRegistered) throw new Error("You are already registered for this event");
 
   if (event.volunteers_needed && event.volunteers.length >= event.volunteers_needed) {
-    throw new Error("Volunteer slots are already filled");
+    throw new Error("No more volunteer slots available for this event");
   }
 
-  await prisma.eventVolunteer.create({
+  const newVolunteer = await prisma.EventVolunteer.create({
     data: {
-      event_id: eventId,
-      user_id: user.id,
+      event: { connect: { id: event_id } },
+      user: { connect: { id: user.id } },
+      registered_at: new Date().toISOString(),
     },
   });
 
-
-  return prisma.event.findUnique({
-    where: { id: eventId },
-    include: { volunteers: true },
-  });
+  return newVolunteer;
 }
 
-
 ,
+
   async removeVolunteer(_, { event_id, user_id }, { user }) {
     if (!user) throw new Error("Not authenticated");
 

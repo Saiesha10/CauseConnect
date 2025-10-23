@@ -111,6 +111,7 @@ type Query {
   organizerDonations: [Donation]
   organizerVolunteers: [EventVolunteer]
   organizerFavorites: [Favorite]
+  
 }
 
 type Mutation {
@@ -152,6 +153,14 @@ type Mutation {
   createEvent(
     ngo_id: ID!
     title: String!
+    description: String
+    event_date: String
+    location: String
+    volunteers_needed: Int
+  ): Event
+  updateEvent(
+    id: ID!
+    title: String
     description: String
     event_date: String
     location: String

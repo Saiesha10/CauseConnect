@@ -79,7 +79,7 @@ const VolunteerList = () => {
                   <Chip label={status} color={getStatusColor(status)} size="small" />
                 </Box>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  For Event: <strong>{vol.event.title}</strong>
+                  for: <strong>{vol.event.title}</strong>
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Event Date: {parseDate(vol.event.event_date)}
@@ -93,7 +93,7 @@ const VolunteerList = () => {
         })}
       </Grid>
 
-    
+   
       <Modal
         open={!!selectedUser}
         onClose={handleClose}

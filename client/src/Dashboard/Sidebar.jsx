@@ -18,8 +18,8 @@ const Sidebar = ({ role }) => {
       ? [
           { text: "Profile", path: "profile" },
           { text: "My NGOs", path: "ngos" },
-          { text: "My Events", path: "events" },
-          { text: "My Donations", path: "donations" },
+          { text: "Events", path: "events" },
+          { text: "Donations", path: "donations" },
           { text: "My Volunteering", path: "volunteering" },
           { text: "Volunteers", path: "volunteers" },
           { text: "Favorites", path: "favorites" },
@@ -32,7 +32,9 @@ const Sidebar = ({ role }) => {
         ];
 
   const handleClick = (path) => {
-    navigate(`/dashboard/${path}`);
+    
+    const basePath = role === "organizer" ? "/dashboard" : "/user-dashboard";
+    navigate(`${basePath}/${path}`);
     setActive(path);
   };
 

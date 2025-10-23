@@ -1,47 +1,96 @@
 import React from "react";
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
+import { useQuery, gql } from "@apollo/client";
+
+import Sidebar from "../Dashboard/Sidebar";
+import ProfileSection from "../components/ProfileSection";
 import DonationList from "../components/DonationList";
 import EventList from "../components/EventList";
 import FavoritesList from "../components/FavoritesList";
-import ProfileSection from "../components/ProfileSection";
+
+
+const GET_USER_BY_ID = gql`
+  query getUser($id: ID!) {
+    user(id: $id) {
+      id
+      full_name
+      email
+      role
+      profile_picture
+    }
+  }
+`;
 
 const UserDashboard = () => {
-  return (
-    <Box sx={{ p: { xs: 2, md: 4 }, pt: "100px", bgcolor: "#f9f9f9", minHeight: "100vh" }}>
-      <Typography
-        variant="h4"
+  const token = localStorage.getItem("cc_token");
+  if (!token) return <Navigate to="/login" />;
+
+  let userId = null;
+  try {
+    userId = JSON.parse(atob(token.split(".")[1])).userId;
+  } catch (e) {
+    console.error("Invalid token", e);
+    return <Navigate to="/login" />;
+  }
+
+  const { data, loading, error } = useQuery(GET_USER_BY_ID, {
+    variables: { id: userId },
+    skip: !userId,
+    fetchPolicy: "cache-and-network",
+  });
+
+  if (loading)
+    return (
+      <Box
         sx={{
-          mb: 4,
-          fontFamily: "'Work Sans', sans-serif",
-          fontWeight: 600,
-          color: "#E76F51",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
-        User Dashboard
-      </Typography>
-
-      <Box sx={{ mb: 4 }}>
-        <DonationList />
+        <CircularProgress />
       </Box>
+    );
 
-      <Divider sx={{ mb: 4 }} />
-
-
-      <Box sx={{ mb: 4 }}>
-        <EventList user={true} />
+  if (error)
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <Typography variant="h6" color="error">
+          Error fetching user data
+        </Typography>
       </Box>
+    );
 
-      <Divider sx={{ mb: 4 }} />
+  const role = data?.user?.role;
+
+  
+  if (role === "organizer") return <Navigate to="/dashboard" />; 
+  if (role !== "user") return <Navigate to="/login" />; 
 
  
-      <Box sx={{ mb: 4 }}>
-        <FavoritesList user={true} />
-      </Box>
+  return (
+    <Box sx={{ display: "flex", bgcolor: "#f9f9f9", minHeight: "100vh" }}>
+      <Sidebar role={role} /> 
+      <Box sx={{ flex: 1, p: { xs: 2, md: 3 } }}>
+        <Routes>
+          {/* User-specific routes */}
+          <Route path="profile" element={<ProfileSection userId={userId} />} />
+          <Route path="donations" element={<DonationList user={true} />} />
+          <Route path="volunteering" element={<EventList user={true} />} />
+          <Route path="favorites" element={<FavoritesList user={true} />} />
 
-      <Divider sx={{ mb: 4 }} />
-
-      <Box sx={{ mb: 4 }}>
-        <ProfileSection />
+          {/* Fallback */}
+          <Route path="*" element={<ProfileSection userId={userId} />} />
+        </Routes>
       </Box>
     </Box>
   );

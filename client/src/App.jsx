@@ -9,12 +9,15 @@ import NGO_Listings from "./pages/NGO_Listings";
 import NGO_Details from "./pages/NGO_Details";
 import Add_NGO from "./pages/Add_NGO";
 import Dashboard from "./Dashboard/Dashboard";
+import UserDashboard from "./Dashboard/UserDashboard";
 import CreateEvent from "./pages/CreateEvent";
+
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("cc_token");
   return token ? children : <Navigate to="/login" />;
 };
+
 
 const OrganizerRoute = ({ children }) => {
   const token = localStorage.getItem("cc_token");
@@ -30,6 +33,23 @@ const OrganizerRoute = ({ children }) => {
   }
 
   return role === "organizer" ? children : <Navigate to="/" />;
+};
+
+
+const UserRoute = ({ children }) => {
+  const token = localStorage.getItem("cc_token");
+  if (!token) return <Navigate to="/login" />;
+
+  let role = null;
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    role = payload.role;
+  } catch (err) {
+    console.error("Invalid token:", err);
+    return <Navigate to="/login" />;
+  }
+
+  return role === "user" ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -50,14 +70,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/login"
-          element={token ? <Navigate to="/" /> : <Login />}
-        />
-        <Route
-          path="/signup"
-          element={token ? <Navigate to="/" /> : <Signup />}
-        />
+        <Route path="/login" element={token ? <Navigate to="/" /> : <Login />} />
+        <Route path="/signup" element={token ? <Navigate to="/" /> : <Signup />} />
         <Route
           path="/ngos"
           element={
@@ -70,7 +84,6 @@ function App() {
           path="/ngo/:id"
           element={
             <PrivateRoute>
-              
               <NGO_Details user={user} />
             </PrivateRoute>
           }
@@ -91,18 +104,38 @@ function App() {
             </OrganizerRoute>
           }
         />
+
+       
         <Route
           path="/dashboard/*"
           element={
-            <PrivateRoute>
+            <OrganizerRoute>
               <Dashboard role={user?.role} />
-            </PrivateRoute>
+            </OrganizerRoute>
           }
         />
+
+      
+        <Route
+          path="/user-dashboard/*"
+          element={
+            <UserRoute>
+              <UserDashboard />
+            </UserRoute>
+          }
+        />
+
+      
         <Route
           path="/dashboard/events/create/:ngoId"
-          element={<CreateEvent />}
+          element={
+            <OrganizerRoute>
+              <CreateEvent />
+            </OrganizerRoute>
+          }
         />
+
+   
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

@@ -45,14 +45,18 @@ const Dashboard = () => {
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
+      >
         <CircularProgress />
       </Box>
     );
 
   if (error)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <Box
+        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
+      >
         <Typography variant="h6" color="error">
           Error fetching user data
         </Typography>
@@ -60,7 +64,10 @@ const Dashboard = () => {
     );
 
   const role = data?.user?.role;
-  if (role !== "organizer") return <Navigate to="/user-dashboard" />;
+
+
+  if (role === "user") return <Navigate to="/user-dashboard" />; 
+  if (role !== "organizer") return <Navigate to="/login" />; 
 
   return (
     <Box sx={{ display: "flex", bgcolor: "#fafafa", minHeight: "100vh" }}>
@@ -86,6 +93,7 @@ const Dashboard = () => {
     </Box>
   );
 };
+
 
 const CreateEventWrapper = () => {
   const { ngoId } = useParams();

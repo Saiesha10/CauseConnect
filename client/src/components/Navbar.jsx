@@ -1,4 +1,3 @@
-
 import React from "react";
 import { AppBar, Toolbar, Button, Box, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
@@ -68,6 +67,9 @@ const Navbar = () => {
     "&:hover": { backgroundColor: "#D65A3C" },
   };
 
+
+  const dashboardRoute = role === "user" ? "/user-dashboard" : "/dashboard";
+
   return (
     <>
       <style>
@@ -121,14 +123,12 @@ const Navbar = () => {
               </Button>
             )}
 
-      
             {token && !loading && (
-              <Button component={Link} to="/dashboard" variant="contained" sx={navButtonStyle}>
+              <Button component={Link} to={dashboardRoute} variant="contained" sx={navButtonStyle}>
                 Dashboard
               </Button>
             )}
 
-      
             {token && role === "organizer" && !loading && (
               <Button component={Link} to="/add-ngo" variant="contained" sx={navButtonStyle}>
                 Add NGO
