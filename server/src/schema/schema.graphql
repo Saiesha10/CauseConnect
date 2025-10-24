@@ -106,6 +106,7 @@ type Query {
   userDonations: [Donation]
   userFavorites: [Favorite]
   userNotifications: [Notification]
+  userVolunteers(userId: ID!): [EventVolunteer!]!
   organizerNGOs: [NGO]
   organizerEvents: [Event]
   organizerDonations: [Donation]

@@ -172,37 +172,48 @@ async updateEvent(_, args, { user }) {
 
     return prisma.Favorite.create({ data: { ngo_id, user_id: user.userId } });
   },
+registerVolunteer: async (_, { event_id }, { prisma, user, req }) => {
 
-  async registerVolunteer(_, { event_id }, { prisma, user }) {
-  if (!event_id) throw new Error("Event ID is required");
-  if (!user) throw new Error("Not authenticated"); // now user will always exist
+  let currentUser = user;
 
-  const event = await prisma.Event.findUnique({
-    where: { id: event_id },
-    include: { volunteers: true },
-  });
-
-  if (!event) throw new Error("Event not found");
-
-  const alreadyRegistered = event.volunteers.some(v => v.user_id === user.id);
-  if (alreadyRegistered) throw new Error("You are already registered for this event");
-
-  if (event.volunteers_needed && event.volunteers.length >= event.volunteers_needed) {
-    throw new Error("No more volunteer slots available for this event");
+  if (!currentUser) {
+    const authHeader = req.headers.authorization || "";
+    if (authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      try {
+        currentUser = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        throw new Error("Unauthorized: Invalid token");
+      }
+    }
   }
 
-  const newVolunteer = await prisma.EventVolunteer.create({
-    data: {
-      event: { connect: { id: event_id } },
-      user: { connect: { id: user.id } },
-      registered_at: new Date().toISOString(),
-    },
+  if (!currentUser) {
+    throw new Error("Unauthorized: You must be logged in to register for an event.");
+  }
+
+  const user_id = currentUser.userId; 
+
+  const alreadyRegistered = await prisma.EventVolunteer.findFirst({
+    where: { event_id, user_id },
   });
 
-  return newVolunteer;
-}
+  if (alreadyRegistered) {
+    throw new Error("You have already registered for this event.");
+  }
 
-,
+ 
+  const registration = await prisma.EventVolunteer.create({
+    data: {
+      event_id,
+      user_id,
+      registered_at: new Date(),
+    },
+    include: { user: true, event: true },
+  });
+
+  return registration;
+},
 
   async removeVolunteer(_, { event_id, user_id }, { user }) {
     if (!user) throw new Error("Not authenticated");

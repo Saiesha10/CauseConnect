@@ -11,7 +11,7 @@ import NGOList from "../components/NGOList";
 import VolunteerList from "../components/VolunteerList";
 import FavoritesList from "../components/FavoritesList";
 import CreateEvent from "../pages/CreateEvent";
-
+import MyVolunteering from "../components/MyVolunteering";
 
 const GET_USER_BY_ID = gql`
   query getUser($id: ID!) {
@@ -45,18 +45,14 @@ const Dashboard = () => {
 
   if (loading)
     return (
-      <Box
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <CircularProgress />
       </Box>
     );
 
   if (error)
     return (
-      <Box
-        sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
         <Typography variant="h6" color="error">
           Error fetching user data
         </Typography>
@@ -64,7 +60,6 @@ const Dashboard = () => {
     );
 
   const role = data?.user?.role;
-
 
   if (role === "user") return <Navigate to="/user-dashboard" />; 
   if (role !== "organizer") return <Navigate to="/login" />; 
@@ -74,26 +69,25 @@ const Dashboard = () => {
       <Sidebar role={role} />
       <Box sx={{ flex: 1, p: { xs: 2, md: 3 } }}>
         <Routes>
-          {/* Common */}
+       
           <Route path="profile" element={<ProfileSection userId={userId} />} />
           <Route path="donations" element={<DonationList organizer />} />
-          <Route path="volunteering" element={<EventList organizer userId={userId} />} />
+          <Route path="volunteering" element={<MyVolunteering organizer userId={userId} />} />
           <Route path="favorites" element={<FavoritesList userId={userId} />} />
 
-          {/* Organizer-only */}
+      
           <Route path="ngos" element={<NGOList organizer userId={userId} />} />
           <Route path="events" element={<EventList organizer userId={userId} />} />
           <Route path="events/create/:ngoId" element={<CreateEventWrapper />} />
           <Route path="volunteers" element={<VolunteerList organizer userId={userId} />} />
 
-          {/* Fallback */}
+        
           <Route path="*" element={<ProfileSection userId={userId} />} />
         </Routes>
       </Box>
     </Box>
   );
 };
-
 
 const CreateEventWrapper = () => {
   const { ngoId } = useParams();

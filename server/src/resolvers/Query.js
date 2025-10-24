@@ -101,6 +101,27 @@ events: async (_, { organizerId }, { user }) => {
     if (!foundUser) throw new Error("User not found");
     return foundUser;
   },
+  userVolunteers: async (_, { userId }, { user: authUser }) => {
+  if (!authUser) throw new Error("Not authenticated");
+
+
+  if (authUser.userId !== userId && authUser.role !== "organizer") {
+    throw new Error("Not authorized");
+  }
+
+  return prisma.EventVolunteer.findMany({
+    where: { user_id: userId },
+    include: {
+      event: {
+        include: {
+          ngo: true
+        }
+      },
+      user: true
+    },
+    orderBy: { registered_at: "desc" }
+  });
+},
 
 
   organizerNGOs: async (_, __, { user }) => {
