@@ -11,7 +11,7 @@ import Add_NGO from "./pages/Add_NGO";
 import Dashboard from "./Dashboard/Dashboard";
 import UserDashboard from "./Dashboard/UserDashboard";
 import CreateEvent from "./pages/CreateEvent";
-
+import * as Sentry from "@sentry/react";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("cc_token");
@@ -66,6 +66,7 @@ function App() {
   }
 
   return (
+    <Sentry.ErrorBoundary fallback={<p>Something went wrong.</p>}>
     <Router>
       <Navbar />
       <Routes>
@@ -139,6 +140,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
+    </Sentry.ErrorBoundary>
   );
 }
 
