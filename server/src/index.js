@@ -14,11 +14,26 @@ dotenv.config();
 const prisma = new PrismaClient();
 const app = express();
 
-app.use(cors());
+// ✅ CORS fix for frontend (Render + Vercel)
+app.use(
+  cors({
+    origin: [
+      "https://causeconnect-zeta.vercel.app", // your frontend domain
+      "http://localhost:5173",                // for local dev
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-const typeDefs = readFileSync(path.join(process.cwd(), "src/schema/schema.graphql"), "utf-8");
+// ✅ Read GraphQL Schema
+const typeDefs = readFileSync(
+  path.join(process.cwd(), "src/schema/schema.graphql"),
+  "utf-8"
+);
 
+// ✅ Apollo Server setup
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -37,22 +52,27 @@ const server = new ApolloServer({
   },
 });
 
+// ✅ Start Apollo + Express
 async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // Sentry error handler (after all routes/controllers)
+  // Sentry handler (optional)
   const Sentry = await import("@sentry/node");
   Sentry.setupExpressErrorHandler(app);
 
   // Optional fallback error handler
   app.use((err, req, res, next) => {
-    res.status(500).end(res.sentry + "\n");
+    console.error("Server error:", err);
+    res.status(500).send("Internal Server Error");
   });
 
+  // ✅ Render assigns PORT dynamically (don’t hardcode 4000)
   const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`Server ready at http://localhost:${PORT}/graphql`);
+
+  // ✅ Use 0.0.0.0 so Render can expose it externally
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server ready at http://localhost:${PORT}/graphql`);
   });
 }
 
