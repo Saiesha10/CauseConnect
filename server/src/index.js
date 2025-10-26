@@ -1,27 +1,30 @@
-import "./instrument.js"; // optional Sentry integration
+import "./instrument.js"; // Sentry or monitoring import
 import express from "express";
 import { readFileSync } from "fs";
 import path from "path";
 import { ApolloServer } from "apollo-server-express";
-import { resolvers } from "./resolvers/resolvers.js";
 import { PrismaClient } from "../generated/prisma/index.js";
-import cors from "cors";
+import { resolvers } from "./resolvers/resolvers.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import cors from "cors";
+import { default as expressPlayground } from "graphql-playground-middleware-express";
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
 
-// ✅ CORS setup — allow your frontend domain
+// ✅ CORS setup (for both Vercel frontend and local dev)
 app.use(
   cors({
     origin: [
-      "https://causeconnect-zeta.vercel.app", // frontend
-      "http://localhost:5173", // dev
+      "https://causeconnect-zeta.vercel.app", // your deployed frontend
+      "http://localhost:5173",                // local frontend
     ],
     credentials: true,
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -37,6 +40,8 @@ const typeDefs = readFileSync(
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  introspection: true, // enables Apollo Sandbox / GraphQL introspection in prod
+  playground: true,    // enables legacy Playground
   context: ({ req }) => {
     let user = null;
     const authHeader = req.headers.authorization || "";
@@ -52,25 +57,35 @@ const server = new ApolloServer({
   },
 });
 
+// ✅ Start server
 async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // ✅ Root route just for testing Render connection
-  app.get("/", (req, res) => {
-    res.send("✅ CauseConnect GraphQL Server is running!");
+  // ✅ Legacy GraphQL Playground route
+  app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
+
+  // ✅ Favicon fix
+  app.get("/favicon.ico", (req, res) => res.status(204).end());
+
+  // ✅ Sentry setup (optional)
+  const Sentry = await import("@sentry/node");
+  Sentry.setupExpressErrorHandler(app);
+
+  // ✅ Error handler
+  app.use((err, req, res, next) => {
+    console.error("Server error:", err);
+    res.status(500).send("Internal Server Error");
   });
 
-  // ✅ Dynamic PORT — Render sets it automatically
   const PORT = process.env.PORT || 4000;
-
-  // ✅ Use 0.0.0.0 for Render
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Server ready at port ${PORT}`);
-    console.log(`🚀 GraphQL endpoint: /graphql`);
+    console.log(`✅ CauseConnect GraphQL Server is running!`);
+    console.log(`🌐 GraphQL endpoint: /graphql`);
+    console.log(`🎮 Playground available at /playground`);
   });
 }
 
 startServer().catch((err) => {
-  console.error("❌ Server startup error:", err);
+  console.error("❌ Failed to start server:", err);
 });
