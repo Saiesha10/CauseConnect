@@ -8,19 +8,18 @@ import { resolvers } from "./resolvers/resolvers.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import cors from "cors";
-import { default as expressPlayground } from "graphql-playground-middleware-express";
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 const app = express();
 
-// ✅ CORS setup for both Vercel frontend and local dev
+// ✅ CORS setup for deployed frontend and local dev
 app.use(
   cors({
     origin: [
-      "https://causeconnect-zeta.vercel.app", // deployed frontend
-      "http://localhost:5173",                // local frontend
+      "https://causeconnect-zeta.vercel.app",
+      "http://localhost:5173",
     ],
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
@@ -40,7 +39,7 @@ const typeDefs = readFileSync(
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true, // enables sandbox / Playground in prod
+  introspection: true, // enables Apollo Sandbox in production
   context: ({ req }) => {
     let user = null;
     const authHeader = req.headers.authorization || "";
@@ -60,15 +59,12 @@ async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // ✅ Legacy Playground route (optional)
-  app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
-
   // ✅ Favicon fix
   app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-  // ✅ Sentry setup
+  // ✅ Sentry setup (dynamic import)
   const Sentry = await import("@sentry/node");
-  Sentry.setupExpressErrorHandler(app);
+  Sentry.init({ dsn: process.env.SENTRY_DSN || "" });
 
   // ✅ Error handler
   app.use((err, req, res, next) => {
@@ -76,12 +72,11 @@ async function startServer() {
     res.status(500).send("Internal Server Error");
   });
 
-  // ✅ Use Render-provided PORT
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ CauseConnect GraphQL Server is running!`);
     console.log(`🌐 GraphQL endpoint: /graphql`);
-    console.log(`🎮 Playground available at /playground`);
+    console.log(`🎮 Apollo Sandbox is available automatically in dev or via /graphql endpoint`);
   });
 }
 
