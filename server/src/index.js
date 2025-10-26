@@ -1,4 +1,4 @@
-import "./instrument.js"; // import Sentry first
+import "./instrument.js"; // optional Sentry integration
 import express from "express";
 import { readFileSync } from "fs";
 import path from "path";
@@ -14,12 +14,12 @@ dotenv.config();
 const prisma = new PrismaClient();
 const app = express();
 
-// ✅ CORS fix for frontend (Render + Vercel)
+// ✅ CORS setup — allow your frontend domain
 app.use(
   cors({
     origin: [
-      "https://causeconnect-zeta.vercel.app", // your frontend domain
-      "http://localhost:5173",                // for local dev
+      "https://causeconnect-zeta.vercel.app", // frontend
+      "http://localhost:5173", // dev
     ],
     credentials: true,
   })
@@ -27,7 +27,7 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Read GraphQL Schema
+// ✅ Load GraphQL schema
 const typeDefs = readFileSync(
   path.join(process.cwd(), "src/schema/schema.graphql"),
   "utf-8"
@@ -52,28 +52,25 @@ const server = new ApolloServer({
   },
 });
 
-// ✅ Start Apollo + Express
 async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // Sentry handler (optional)
-  const Sentry = await import("@sentry/node");
-  Sentry.setupExpressErrorHandler(app);
-
-  // Optional fallback error handler
-  app.use((err, req, res, next) => {
-    console.error("Server error:", err);
-    res.status(500).send("Internal Server Error");
+  // ✅ Root route just for testing Render connection
+  app.get("/", (req, res) => {
+    res.send("✅ CauseConnect GraphQL Server is running!");
   });
 
-  // ✅ Render assigns PORT dynamically (don’t hardcode 4000)
+  // ✅ Dynamic PORT — Render sets it automatically
   const PORT = process.env.PORT || 4000;
 
-  // ✅ Use 0.0.0.0 so Render can expose it externally
+  // ✅ Use 0.0.0.0 for Render
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Server ready at http://localhost:${PORT}/graphql`);
+    console.log(`✅ Server ready at port ${PORT}`);
+    console.log(`🚀 GraphQL endpoint: /graphql`);
   });
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error("❌ Server startup error:", err);
+});
