@@ -122,7 +122,6 @@ const Signup = ({ onSuccess }) => {
           <TextField fullWidth label="Password" type="password" margin="dense" value={password} onChange={(e) => setPassword(e.target.value)} required />
           <TextField select fullWidth label="Role" margin="dense" value={role} onChange={(e) => setRole(e.target.value)} required>
             <MenuItem value="user">User</MenuItem>
-            <MenuItem value="volunteer">Volunteer</MenuItem>
             <MenuItem value="organizer">Organizer</MenuItem>
           </TextField>
           <TextField fullWidth label="Phone" margin="dense" value={phone} onChange={(e) => setPhone(e.target.value)} />
