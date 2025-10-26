@@ -4,7 +4,8 @@ import { setContext } from "@apollo/client/link/context";
 // ✅ Use your deployed Render backend or local server
 const GRAPHQL_HTTP =
   import.meta.env.VITE_GRAPHQL_HTTP ||
-  "https://causeconnect-787i.onrender.com/graphql";
+  "https://causeconnect-vskr.onrender.com/graphql";
+
 
 const httpLink = createHttpLink({
   uri: GRAPHQL_HTTP,

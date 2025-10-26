@@ -1,4 +1,4 @@
-import "./instrument.js"; // Sentry or monitoring import
+import "./instrument.js"; // Sentry or monitoring
 import express from "express";
 import { readFileSync } from "fs";
 import path from "path";
@@ -15,11 +15,11 @@ dotenv.config();
 const prisma = new PrismaClient();
 const app = express();
 
-// ✅ CORS setup (for both Vercel frontend and local dev)
+// ✅ CORS setup for both Vercel frontend and local dev
 app.use(
   cors({
     origin: [
-      "https://causeconnect-zeta.vercel.app", // your deployed frontend
+      "https://causeconnect-zeta.vercel.app", // deployed frontend
       "http://localhost:5173",                // local frontend
     ],
     credentials: true,
@@ -40,8 +40,7 @@ const typeDefs = readFileSync(
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true, // enables Apollo Sandbox / GraphQL introspection in prod
-  playground: true,    // enables legacy Playground
+  introspection: true, // enables sandbox / Playground in prod
   context: ({ req }) => {
     let user = null;
     const authHeader = req.headers.authorization || "";
@@ -57,18 +56,17 @@ const server = new ApolloServer({
   },
 });
 
-// ✅ Start server
 async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // ✅ Legacy GraphQL Playground route
+  // ✅ Legacy Playground route (optional)
   app.get("/playground", expressPlayground({ endpoint: "/graphql" }));
 
   // ✅ Favicon fix
   app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-  // ✅ Sentry setup (optional)
+  // ✅ Sentry setup
   const Sentry = await import("@sentry/node");
   Sentry.setupExpressErrorHandler(app);
 
@@ -78,6 +76,7 @@ async function startServer() {
     res.status(500).send("Internal Server Error");
   });
 
+  // ✅ Use Render-provided PORT
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ CauseConnect GraphQL Server is running!`);
