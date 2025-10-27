@@ -9,28 +9,26 @@ datasource db {
 }
 
 model User {
-  id               String   @id @default(uuid()) @map("id")
-  full_name        String   @map("full_name")
-  email            String   @unique @map("email")
-  password         String   @map("password")
-  role             String   @map("role")
-  profile_picture  String?  @map("profile_picture")
-  phone            String?  @map("phone")
-  description      String?  @map("description")
-  created_at       DateTime @default(now()) @map("created_at")
-
+  id               String           @id @default(uuid()) @map("id")
+  full_name        String           @map("full_name")
+  email            String           @unique @map("email")
+  password         String           @map("password")
+  role             String           @map("role")
+  profile_picture  String?          @map("profile_picture")
+  phone            String?          @map("phone")
+  description      String?          @map("description")
+  created_at       DateTime         @default(now()) @map("created_at")
   donations        Donation[]
-  favorites        Favorite[]
-  ngos             NGO[]         @relation("UserNGOs")
-  notifications    Notification[]
   volunteer_events EventVolunteer[]
-  
-  @@map("users") // table name in DB
+  favorites        Favorite[]
+  ngos             NGO[]            @relation("UserNGOs")
+  notifications    Notification[]
+
+  @@map("users")
 }
 
-
 model NGO {
-  id            String   @id @default(uuid())
+  id            String     @id @default(uuid())
   name          String
   cause         String?
   description   String?
@@ -38,17 +36,15 @@ model NGO {
   contact_info  String?
   donation_link String?
   ngo_picture   String?
-  created_at    DateTime @default(now())
+  created_at    DateTime   @default(now())
   created_by    String?
-
   donations     Donation[]
   events        Event[]
   favorites     Favorite[]
-  creator       User?    @relation("UserNGOs", fields: [created_by], references: [id])
-  
+  creator       User?      @relation("UserNGOs", fields: [created_by], references: [id])
+
   @@map("ngos")
 }
-
 
 model Event {
   id                String           @id @default(uuid())
@@ -59,9 +55,8 @@ model Event {
   location          String?
   volunteers_needed Int?
   created_at        DateTime         @default(now())
-
-  ngo               NGO              @relation(fields: [ngo_id], references: [id])
   volunteers        EventVolunteer[]
+  ngo               NGO              @relation(fields: [ngo_id], references: [id])
 
   @@map("events")
 }
@@ -71,11 +66,10 @@ model Donation {
   user_id    String
   ngo_id     String
   amount     Float
-  message    String? // added message field
+  message    String?
   created_at DateTime @default(now())
-
-  user User @relation(fields: [user_id], references: [id])
-  ngo  NGO  @relation(fields: [ngo_id], references: [id])
+  ngo        NGO      @relation(fields: [ngo_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 
   @@map("donations")
 }
@@ -85,22 +79,19 @@ model Favorite {
   user_id    String
   ngo_id     String
   created_at DateTime @default(now())
-
-  user User @relation(fields: [user_id], references: [id])
-  ngo  NGO  @relation(fields: [ngo_id], references: [id])
+  ngo        NGO      @relation(fields: [ngo_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 
   @@map("favorites")
 }
-
 
 model EventVolunteer {
   id            String   @id @default(uuid())
   event_id      String
   user_id       String
   registered_at DateTime @default(now())
-
-  event Event @relation(fields: [event_id], references: [id])
-  user  User  @relation(fields: [user_id], references: [id])
+  event         Event    @relation(fields: [event_id], references: [id])
+  user          User     @relation(fields: [user_id], references: [id])
 
   @@map("event_volunteers")
 }
@@ -111,19 +102,16 @@ model Notification {
   message    String
   cause_id   String?
   created_at DateTime @default(now())
-
-  user  User @relation(fields: [user_id], references: [id])
-  cause Cause? @relation(fields: [cause_id], references: [id])
+  cause      Cause?   @relation(fields: [cause_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 
   @@map("notifications")
 }
 
-
 model Cause {
-  id            String          @id @default(uuid())
+  id            String         @id @default(uuid())
   title         String
-  created_at    DateTime        @default(now())
-
+  created_at    DateTime       @default(now())
   notifications Notification[]
 
   @@map("causes")

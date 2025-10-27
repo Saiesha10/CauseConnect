@@ -1,4 +1,4 @@
-import "./instrument.js"; // Sentry or monitoring
+import "./instrument.js"; 
 import express from "express";
 import { readFileSync } from "fs";
 import path from "path";
@@ -6,6 +6,7 @@ import { ApolloServer } from "apollo-server-express";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { resolvers } from "./resolvers/resolvers.js";
 import jwt from "jsonwebtoken";
+import { initApp } from "./app.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
@@ -14,7 +15,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 const app = express();
 
-// ✅ CORS setup for deployed frontend and local dev
+
 app.use(
   cors({
     origin: [
@@ -29,17 +30,17 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Load GraphQL schema
+
 const typeDefs = readFileSync(
   path.join(process.cwd(), "src/schema/schema.graphql"),
   "utf-8"
 );
 
-// ✅ Apollo Server setup
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true, // enables Apollo Sandbox in production
+  introspection: true, 
   context: ({ req }) => {
     let user = null;
     const authHeader = req.headers.authorization || "";
@@ -59,14 +60,12 @@ async function startServer() {
   await server.start();
   server.applyMiddleware({ app, path: "/graphql" });
 
-  // ✅ Favicon fix
+
   app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-  // ✅ Sentry setup (dynamic import)
   const Sentry = await import("@sentry/node");
   Sentry.init({ dsn: process.env.SENTRY_DSN || "" });
 
-  // ✅ Error handler
   app.use((err, req, res, next) => {
     console.error("Server error:", err);
     res.status(500).send("Internal Server Error");
@@ -74,12 +73,16 @@ async function startServer() {
 
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ CauseConnect GraphQL Server is running!`);
-    console.log(`🌐 GraphQL endpoint: /graphql`);
-    console.log(`🎮 Apollo Sandbox is available automatically in dev or via /graphql endpoint`);
+    console.log(` CauseConnect GraphQL Server is running!`);
+    console.log(` GraphQL endpoint: /graphql`);
+    console.log(` Apollo Sandbox is available automatically in dev or via /graphql endpoint`);
   });
 }
-
+if (process.env.NODE_ENV !== "test") {
+  startServer().catch((err) => {
+    console.error(" Failed to start server:", err);
+  });
+}
 startServer().catch((err) => {
-  console.error("❌ Failed to start server:", err);
+  console.error(" Failed to start server:", err);
 });

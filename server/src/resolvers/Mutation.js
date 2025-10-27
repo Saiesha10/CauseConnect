@@ -30,10 +30,10 @@ export const Mutation = {
 
   async loginUser(_, { email, password }) {
     const user = await prisma.User.findUnique({ where: { email } });
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error("Invalid credentials");
 
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new Error("Incorrect password");
+    if (!valid) throw new Error("Invalid credentials");
 
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
@@ -107,7 +107,7 @@ export const Mutation = {
 
   async createEvent(_, args, { user }) {
   if (!user) throw new Error("Not authenticated");
-  if (user.role !== "organizer") throw new Error("Only organizers can create events");
+  if (user.role !== "organizer") throw new Error("not authorized");
 
   
   const { ngo_id, title, description, event_date, location, volunteers_needed } = args;
@@ -158,20 +158,60 @@ async updateEvent(_, args, { user }) {
     return prisma.Event.delete({ where: { id } });
   },
 
-  async donateToNGO(_, { ngo_id, amount }, { user }) {
+  async donateToNGO(_, { ngo_id, amount, message }, { user }) {
     if (!user) throw new Error("Not authenticated");
 
     return prisma.Donation.create({
-      data: { ngo_id, user_id: user.userId, amount },
+      data: { ngo_id, user_id: user.userId, amount,message },
       include: { user: true, ngo: true },
     });
   },
 
-  async addFavorite(_, { ngo_id }, { user }) {
-    if (!user) throw new Error("Not authenticated");
+  addFavorite: async (_, { ngo_id }, { user, prisma }) => {
+  if (!user || !user.userId) throw new Error("Not authenticated");
 
-    return prisma.Favorite.create({ data: { ngo_id, user_id: user.userId } });
-  },
+  const ngoExists = await prisma.nGO.findUnique({ where: { id: ngo_id } });
+  if (!ngoExists) throw new Error("NGO not found");
+
+  const existing = await prisma.favorite.findFirst({
+    where: { ngo_id, user_id: user.userId },
+  });
+
+  if (existing) throw new Error("NGO already added to favorites");
+
+  const favorite = await prisma.favorite.create({
+    data: {
+      ngo_id,
+      user_id: user.userId,
+    },
+    include: {
+      ngo: true,
+      user: true,
+    },
+  });
+
+  return favorite;
+},
+
+removeFavorite: async (_, { ngo_id }, { user }) => {
+  if (!user) throw new Error("Not authenticated");
+
+  const favorite = await prisma.Favorite.findFirst({
+    where: { user_id: user.id, ngo_id },
+  });
+
+  if (!favorite) {
+    
+    return { message: "Favorite already removed or not found" };
+  }
+
+  await prisma.Favorite.delete({ where: { id: favorite.id } });
+
+  return { message: "Favorite removed successfully" };
+},
+
+
+
 registerVolunteer: async (_, { event_id }, { prisma, user, req }) => {
 
   let currentUser = user;
