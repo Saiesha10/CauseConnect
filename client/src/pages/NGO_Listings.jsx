@@ -18,7 +18,7 @@ import {
 import { gql, useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 
-const GET_ALL_NGOS = gql`
+export const GET_ALL_NGOS = gql`
   query ngos {
     ngos {
       id
@@ -32,7 +32,7 @@ const GET_ALL_NGOS = gql`
   }
 `;
 
-// Animations
+
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }

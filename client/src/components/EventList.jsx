@@ -65,8 +65,8 @@ const navButtonStyle = {
   },
 };
 
-// GraphQL Queries & Mutations
-const GET_EVENTS = gql`
+
+export const GET_EVENTS=gql`
   query events($organizerId: ID) {
     events(organizerId: $organizerId) {
       id
@@ -79,7 +79,7 @@ const GET_EVENTS = gql`
   }
 `;
 
-const GET_ORGANIZER_VOLUNTEERS = gql`
+export const GET_ORGANIZER_VOLUNTEERS = gql`
   query organizerVolunteers {
     organizerVolunteers {
       id
@@ -102,7 +102,7 @@ const GET_ORGANIZER_VOLUNTEERS = gql`
   }
 `;
 
-const REGISTER_VOLUNTEER = gql`
+export const REGISTER_VOLUNTEER = gql`
   mutation registerVolunteer($event_id: ID!) {
     registerVolunteer(event_id: $event_id) {
       id
@@ -113,7 +113,7 @@ const REGISTER_VOLUNTEER = gql`
   }
 `;
 
-const DELETE_EVENT = gql`
+export const DELETE_EVENT = gql`
   mutation deleteEvent($id: ID!) {
     deleteEvent(id: $id) {
       id
@@ -121,7 +121,7 @@ const DELETE_EVENT = gql`
   }
 `;
 
-const UPDATE_EVENT = gql`
+export const UPDATE_EVENT = gql`
   mutation updateEvent(
     $id: ID!
     $title: String
