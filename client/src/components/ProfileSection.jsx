@@ -54,7 +54,7 @@ const navButtonStyle = {
 };
 
 // GraphQL Queries & Mutations
-const GET_USER = gql`
+export const GET_USER = gql`
   query GetUser($id: ID!) {
     user(id: $id) {
       id
@@ -69,7 +69,7 @@ const GET_USER = gql`
   }
 `;
 
-const UPDATE_USER = gql`
+export const UPDATE_USER = gql`
   mutation UpdateUser(
     $id: ID!
     $full_name: String

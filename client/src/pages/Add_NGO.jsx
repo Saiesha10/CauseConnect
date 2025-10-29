@@ -56,7 +56,7 @@ const navButtonStyle = {
 };
 
 // GraphQL Queries & Mutations
-const CREATE_NGO = gql`
+export const CREATE_NGO = gql`
   mutation createNGO(
     $name: String!
     $cause: String!
@@ -87,7 +87,7 @@ const CREATE_NGO = gql`
   }
 `;
 
-const UPDATE_NGO = gql`
+export const UPDATE_NGO = gql`
   mutation updateNGO(
     $id: ID!
     $name: String
@@ -120,7 +120,7 @@ const UPDATE_NGO = gql`
   }
 `;
 
-const GET_NGO_BY_ID = gql`
+export const GET_NGO_BY_ID = gql`
   query ngo($id: ID!) {
     ngo(id: $id) {
       id
@@ -310,6 +310,7 @@ const Add_NGO = () => {
               ].map((field, idx) => (
                 <TextField
                   key={field.name}
+                  id={field.name}
                   fullWidth
                   label={field.label}
                   name={field.name}
@@ -320,6 +321,7 @@ const Add_NGO = () => {
                   rows={field.rows}
                   error={!!errors[field.name]}
                   helperText={errors[field.name]}
+                  InputLabelProps={{ htmlFor: field.name }} 
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">

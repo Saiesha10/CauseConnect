@@ -19,7 +19,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DescriptionIcon from "@mui/icons-material/Description";
 
 
-const GET_USER_FAVORITES = gql`
+export const GET_USER_FAVORITES = gql`
   query GetUserFavorites {
     userFavorites {
       id
@@ -35,7 +35,7 @@ const GET_USER_FAVORITES = gql`
   }
 `;
 
-const REMOVE_FAVORITE = gql`
+export const REMOVE_FAVORITE = gql`
   mutation RemoveFavorite($ngo_id: ID!) {
     removeFavorite(ngo_id: $ngo_id)
   }
