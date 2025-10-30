@@ -5,7 +5,7 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
   const email = 'saiesha21052@gmail.com';
   const password = 'esha1010#';
 
-  // 🔐 Reusable login session
+  
   const loginSession = () => {
     cy.visit(`${baseUrl}/login`, { timeout: 60000 });
     cy.get('input[type="email"]').should('be.visible').clear().type(email);
@@ -26,14 +26,13 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
     cy.session('authSession', loginSession);
   });
 
-  // ✅ 1. Verify dashboard loads
+  
   it('loads Donations dashboard page successfully', () => {
     cy.visit(`${baseUrl}/dashboard/donations`, { timeout: 60000 });
     cy.url().should('include', '/dashboard/donations');
     cy.contains(/My Donations|Donations to My NGOs/i, { timeout: 20000 }).should('be.visible');
   });
 
-  // ✅ 2. Shows spinner during load (if backend takes time)
   it('shows loading spinner while fetching data', () => {
     cy.intercept('POST', '**/graphql', (req) => {
       req.on('response', (res) => res.setDelay(1000)); // simulate delay
@@ -48,12 +47,11 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
     cy.wait('@graphqlDelay');
   });
 
-  // ✅ 3. Display donation cards (real backend)
   it('displays donation cards with donor/NGO details', () => {
     cy.visit(`${baseUrl}/dashboard/donations`, { timeout: 60000 });
 
     cy.get('body', { timeout: 20000 }).then(($body) => {
-      // If donations exist
+     
       if ($body.find('.MuiCard-root').length > 0) {
         cy.get('.MuiCard-root').first().within(() => {
           cy.get('img, .MuiAvatar-root').should('exist');
@@ -66,13 +64,12 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
       } else if ($body.text().match(/Error fetching donations|Something went wrong/i)) {
         cy.contains(/Error fetching donations|Something went wrong/i).should('exist');
       } else {
-        // fallback: ensure page loaded
+       
         expect($body.text().length).to.be.greaterThan(0);
       }
     });
   });
 
-  // ✅ 4. Mocked empty donations (for CI or test)
   it('shows "No donations found" when API returns empty (mocked)', () => {
     cy.intercept('POST', '**/graphql', (req) => {
       if (
@@ -89,9 +86,7 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
     cy.visit(`${baseUrl}/dashboard/donations`);
     cy.wait('@emptyDonations');
     cy.contains(/No donations found/i, { timeout: 10000 }).should('exist');
-  });
-
-  // ✅ 5. Mocked API failure handling
+  })
   it('shows error message when API fails (mocked)', () => {
     cy.intercept('POST', '**/graphql', {
       statusCode: 500,
@@ -101,7 +96,7 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
     cy.visit(`${baseUrl}/dashboard/donations`);
     cy.wait('@errorQuery');
 
-    // Match your actual UI error message
+    
     cy.get('body').then(($b) => {
       if ($b.text().match(/Error fetching donations|Failed to load donations/i)) {
         cy.contains(/Error fetching donations|Failed to load donations/i).should('exist');
@@ -109,7 +104,6 @@ describe('🧪 CauseConnect Donations Dashboard E2E (Deployed backend, AuthSessi
     });
   });
 
-  // ✅ 6. Role-based display check
   it('displays correct section based on user role', () => {
     cy.visit(`${baseUrl}/dashboard/donations`);
     cy.get('body').then(($b) => {
