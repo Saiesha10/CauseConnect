@@ -262,34 +262,21 @@ const EventList = ({ user, organizer = false, userId }) => {
   };
 
   const handleEventSave = async () => {
-  if (!validateEditForm()) {
-    setSnackbar({ open: true, message: "Please fix the errors in the form.", severity: "error" });
-    return;
-  }
-
-  // ✅ Ensure event_date is valid and properly formatted
-  let formattedDate = null;
-  if (editEventData.event_date) {
-    const date = new Date(editEventData.event_date);
-    if (!isNaN(date.getTime())) {
-      formattedDate = date.toISOString(); // convert to ISO string
+    if (!validateEditForm()) {
+      setSnackbar({ open: true, message: "Please fix the errors in the form.", severity: "error" });
+      return;
     }
-  }
-
-  await updateEvent({
-    variables: {
-      id: editEventData.id,
-      title: editEventData.title,
-      description: editEventData.description || null,
-      event_date: formattedDate, // ✅ use ISO date or null
-      location: editEventData.location || null,
-      volunteers_needed: editEventData.volunteers_needed
-        ? parseInt(editEventData.volunteers_needed)
-        : null,
-    },
-  });
-};
-
+    await updateEvent({
+      variables: {
+        id: editEventData.id,
+        title: editEventData.title,
+        description: editEventData.description || null,
+        event_date: editEventData.event_date || null,
+        location: editEventData.location || null,
+        volunteers_needed: editEventData.volunteers_needed ? parseInt(editEventData.volunteers_needed) : null,
+      },
+    });
+  };
 
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
 
@@ -935,7 +922,7 @@ const EventList = ({ user, organizer = false, userId }) => {
             variant="contained"
             sx={{ ...navButtonStyle, fontSize: { xs: "0.9rem", sm: "1rem" } }}
             onClick={handleEventSave}
-            disabled={volunteering }
+            disabled={volunteering || Object.keys(errors).length > 0}
           >
             Save
           </Button>
