@@ -6,7 +6,7 @@ import { ApolloServer } from "apollo-server-express";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { resolvers } from "./resolvers/resolvers.js";
 import jwt from "jsonwebtoken";
-import { initApp } from "./app.js";
+
 import dotenv from "dotenv";
 import cors from "cors";
 
