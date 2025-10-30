@@ -16,7 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import { uploadToCloudinary } from "../utils/cloudinary";
 
-export const SIGNUP_MUTATION = gql`
+const SIGNUP_MUTATION = gql`
   mutation signUpUser(
     $full_name: String!
     $email: String!
@@ -45,7 +45,7 @@ export const SIGNUP_MUTATION = gql`
   }
 `;
 
-
+// Animations
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }

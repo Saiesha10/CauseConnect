@@ -33,7 +33,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
 import LinkIcon from "@mui/icons-material/Link";
 
-
+// Animations
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -65,6 +65,7 @@ const navButtonStyle = {
   },
 };
 
+// GraphQL Queries & Mutations
 const GET_ORGANIZER_NGOS = gql`
   query organizerNGOs {
     organizerNGOs {

@@ -25,6 +25,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import client from "../apolloClient";
 
+// Animations
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -58,7 +59,7 @@ const navButtonStyle = {
   },
 };
 
-
+// GraphQL Queries & Mutations
 export const GET_NGO = gql`
   query getNGO($id: ID!) {
     ngo(id: $id) {
@@ -179,17 +180,17 @@ const NGO_Details = () => {
   const { loading, error, data, refetch } = useQuery(GET_NGO, {
     variables: { id },
     fetchPolicy: "cache-and-network",
-    
+    client,
   });
 
   const { data: favoritesData, refetch: refetchFavorites } = useQuery(GET_USER_FAVORITES, {
     fetchPolicy: "cache-and-network",
-    
+    client,
   });
 
   const { data: volunteerData, loading: volunteerLoading, error: volunteerError, refetch: refetchVolunteers } = useQuery(GET_ORGANIZER_VOLUNTEERS, {
     fetchPolicy: "cache-and-network",
-   
+    client,
   });
 
   const [addFavoriteMutation] = useMutation(ADD_FAVORITE, {
