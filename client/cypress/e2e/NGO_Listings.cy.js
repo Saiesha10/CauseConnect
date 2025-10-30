@@ -7,7 +7,7 @@ describe('🧪 CauseConnect NGO Details Page E2E (Authenticated)', () => {
   const ngoId = '2ccf961a-8f4a-4255-a5de-6e9a5e7c4091';
 
   beforeEach(() => {
-    // Maintain session login
+   
     cy.session('authSession', () => {
       cy.visit(`${baseUrl}/login`, { timeout: 40000 });
 
