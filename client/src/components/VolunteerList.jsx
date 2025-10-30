@@ -21,7 +21,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EventIcon from "@mui/icons-material/Event";
 
-// Animations
+
 const fadeIn = keyframes`
   from { opacity: 0; }
   to { opacity: 1; }
@@ -53,7 +53,7 @@ const navButtonStyle = {
   },
 };
 
-// GraphQL query
+
 const GET_ORGANIZER_VOLUNTEERS = gql`
   query organizerVolunteers {
     organizerVolunteers {

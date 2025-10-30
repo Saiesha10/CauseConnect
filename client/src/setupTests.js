@@ -1,6 +1,8 @@
-import "@testing-library/jest-dom";
-import { server } from "../test/server"; 
 
-beforeAll(() => server.listen());
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
+import "@testing-library/jest-dom";
+
+
+import { TextEncoder, TextDecoder } from "util";
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;

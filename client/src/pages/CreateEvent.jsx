@@ -41,7 +41,7 @@ const navButtonStyle = {
 };
 
 // GraphQL Mutation
-const CREATE_EVENT = gql`
+export const CREATE_EVENT = gql`
   mutation createEvent(
     $ngo_id: ID!,
     $title: String!,
