@@ -22,7 +22,11 @@ export const Query = {
         events: true,
         donations: true,
         favorites: true,
+<<<<<<< HEAD
         creator: true, // ✅ relation field (keep this)
+=======
+        creator: true,
+>>>>>>> 5ce0fb85aaaaa3d8f12a53771792e1f63fd1b92c
       },
     });
 
