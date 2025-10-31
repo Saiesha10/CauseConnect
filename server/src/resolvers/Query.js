@@ -3,7 +3,6 @@ import { PrismaClient } from "../../generated/prisma/index.js";
 const prisma = new PrismaClient();
 
 export const Query = {
-  // 🔒 Get all NGOs (requires authentication)
   ngos: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
 
@@ -12,7 +11,6 @@ export const Query = {
     });
   },
 
-  // 🔒 Get NGO by ID
   ngo: async (_, { id }, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
 
@@ -22,11 +20,9 @@ export const Query = {
         events: true,
         donations: true,
         favorites: true,
-<<<<<<< HEAD
-        creator: true, // ✅ relation field (keep this)
-=======
+      
         creator: true,
->>>>>>> 5ce0fb85aaaaa3d8f12a53771792e1f63fd1b92c
+
       },
     });
 
@@ -34,12 +30,11 @@ export const Query = {
     return ngo;
   },
 
-  // 🔒 Get all events (optionally filtered by organizer)
   events: async (_, { organizerId }, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
 
     const where = organizerId
-      ? { ngo: { created_by: organizerId } } // ✅ FIXED (use scalar)
+      ? { ngo: { created_by: organizerId } } 
       : {};
 
     return prisma.Event.findMany({
@@ -49,7 +44,7 @@ export const Query = {
     });
   },
 
-  // 🔒 Get all donations made by the logged-in user
+  
   userDonations: async (_, __, { prisma, user }) => {
     if (!user || !user.userId) {
       throw new Error("Not authenticated");
@@ -63,7 +58,6 @@ export const Query = {
     return donations || [];
   },
 
-  // 🔒 Get all favorite NGOs for the user
   userFavorites: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
 
@@ -72,8 +66,6 @@ export const Query = {
       include: { ngo: true },
     });
   },
-
-  // 🔒 Get all notifications for the user
   userNotifications: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
 
@@ -82,16 +74,12 @@ export const Query = {
       include: { cause: true },
     });
   },
-
-  // 🔒 Admin/Organizer can view all users
   users: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
     if (user.role !== "organizer") throw new Error("Not authorized");
 
     return prisma.User.findMany();
   },
-
-  // 🔒 Get specific user (self or organizer)
   user: async (_, { id }, { user: authUser }) => {
     if (!authUser || !authUser.userId) throw new Error("Not authenticated");
 
@@ -114,7 +102,6 @@ export const Query = {
     return foundUser;
   },
 
-  // 🔒 Get volunteering data for a user
   userVolunteers: async (_, { userId }, { user: authUser }) => {
     if (!authUser || !authUser.userId) throw new Error("Not authenticated");
 
@@ -132,31 +119,28 @@ export const Query = {
     });
   },
 
-  // 🔒 Organizer’s own NGOs
   organizerNGOs: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
     if (user.role !== "organizer") throw new Error("Not authorized");
 
     return prisma.NGO.findMany({
-      where: { created_by: user.userId }, // ✅ FIXED (use scalar)
+      where: { created_by: user.userId }, 
       include: { donations: true, events: true, favorites: true },
       orderBy: { created_at: "desc" },
     });
   },
 
-  // 🔒 Organizer’s events
   organizerEvents: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
     if (user.role !== "organizer") throw new Error("Not authorized");
 
     return prisma.Event.findMany({
-      where: { ngo: { created_by: user.userId } }, // ✅ FIXED
+      where: { ngo: { created_by: user.userId } },
       include: { volunteers: true },
       orderBy: { created_at: "desc" },
     });
   },
 
-  // 🔒 Organizer’s donations
   organizerDonations: async (_, __, { prisma, user }) => {
     if (!user || !user.userId) {
       throw new Error("Not authenticated");
@@ -167,33 +151,31 @@ export const Query = {
     }
 
     const donations = await prisma.donation.findMany({
-      where: { ngo: { created_by: user.userId } }, // ✅ FIXED
+      where: { ngo: { created_by: user.userId } }, 
       include: { ngo: true, user: true },
     });
 
     return donations || [];
   },
 
-  // 🔒 Organizer’s volunteers
   organizerVolunteers: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
     if (user.role !== "organizer") throw new Error("Not authorized");
 
     return prisma.EventVolunteer.findMany({
-      where: { event: { ngo: { created_by: user.userId } } }, // ✅ FIXED
+      where: { event: { ngo: { created_by: user.userId } } },
       include: { event: true, user: true },
       orderBy: { registered_at: "desc" },
     });
   },
 
-  // 🔒 Organizer’s favorited NGOs
   organizerFavorites: async (_, __, { user }) => {
     if (!user || !user.userId) throw new Error("Not authenticated");
     if (user.role !== "organizer")
       throw new Error("Only organizers can access this");
 
     return prisma.Favorite.findMany({
-      where: { ngo: { created_by: user.userId } }, // ✅ FIXED
+      where: { ngo: { created_by: user.userId } }, 
       include: { ngo: true, user: true },
     });
   },
