@@ -284,25 +284,73 @@ const NGO_Details = () => {
   }, [donationAmount, donationMessage, donateToNGOMutation, data?.ngo.id]);
 
   const handleFavoriteToggle = useCallback(async () => {
-    try {
-      if (isFavorite) {
-        await removeFavoriteMutation({ variables: { ngo_id: id } });
-        setSnackbar({ open: true, message: "Removed from favorites", severity: "info" });
-        setIsFavorite(false);
-      } else {
-        const alreadyFav = favoritesData?.userFavorites?.some((fav) => fav.ngo_id === id);
-        if (alreadyFav) {
-          setSnackbar({ open: true, message: "Already in favorites ❤️", severity: "warning" });
-          return;
-        }
-        await addFavoriteMutation({ variables: { ngo_id: id } });
-        setSnackbar({ open: true, message: "Added to favorites ❤️", severity: "success" });
-        setIsFavorite(true);
+  try {
+    if (isFavorite) {
+     
+      const res = await removeFavoriteMutation({ variables: { ngo_id: id } });
+
+     
+      const message =
+        typeof res.data?.removeFavorite === "string"
+          ? res.data.removeFavorite
+          : res.data?.removeFavorite?.message || "Removed from favorites 💔";
+
+      setIsFavorite(false);
+      setSnackbar({
+        open: true,
+        message,
+        severity: "info",
+      });
+
+     
+      setTimeout(() => refetchFavorites(), 300);
+    } else {
+   
+      const alreadyFav = favoritesData?.userFavorites?.some(
+        (fav) => fav.ngo_id === id
+      );
+      if (alreadyFav) {
+        setSnackbar({
+          open: true,
+          message: "Already in favorites ❤️",
+          severity: "warning",
+        });
+        return;
       }
-    } catch (err) {
-      setSnackbar({ open: true, message: err.message || "Action failed", severity: "error" });
+
+      await addFavoriteMutation({ variables: { ngo_id: id } });
+      setIsFavorite(true);
+      setSnackbar({
+        open: true,
+        message: "Added to favorites ❤️",
+        severity: "success",
+      });
+
+      setTimeout(() => refetchFavorites(), 300);
     }
-  }, [isFavorite, addFavoriteMutation, removeFavoriteMutation, favoritesData, id]);
+  } catch (err) {
+    
+    const safeMessage =
+      err?.message?.includes("already") || err?.message?.includes("not found")
+        ? err.message
+        : "Action failed. Please try again.";
+
+    setSnackbar({
+      open: true,
+      message: safeMessage,
+      severity: "error",
+    });
+  }
+}, [
+  isFavorite,
+  addFavoriteMutation,
+  removeFavoriteMutation,
+  favoritesData,
+  id,
+  refetchFavorites,
+]);
+
+
 
   if (loading)
     return (

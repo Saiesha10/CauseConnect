@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import {
   Box,
@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DescriptionIcon from "@mui/icons-material/Description";
-
 
 export const GET_USER_FAVORITES = gql`
   query GetUserFavorites {
@@ -64,10 +63,11 @@ const navButtonStyle = {
 
 const FavoritesList = () => {
   const navigate = useNavigate();
-  const { data, loading, error } = useQuery(GET_USER_FAVORITES, {
+  const { data, loading, error, refetch } = useQuery(GET_USER_FAVORITES, {
     fetchPolicy: "cache-and-network",
   });
 
+  const [favorites, setFavorites] = useState([]);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -75,30 +75,20 @@ const FavoritesList = () => {
   });
 
 
+  useEffect(() => {
+    if (data?.userFavorites) {
+      setFavorites(data.userFavorites);
+    }
+  }, [data]);
+
   const [removeFavorite] = useMutation(REMOVE_FAVORITE, {
-    update(cache, { data: mutationData, variables }) {
-      try {
-        const existing = cache.readQuery({ query: GET_USER_FAVORITES });
-        if (!existing || !existing.userFavorites) return;
-
-        const updatedFavorites = existing.userFavorites.filter(
-          (fav) => fav.ngo.id !== variables.ngo_id
-        );
-
-        cache.writeQuery({
-          query: GET_USER_FAVORITES,
-          data: { userFavorites: updatedFavorites },
-        });
-      } catch (err) {
-        console.warn("Cache update skipped:", err);
-      }
-    },
     onCompleted: () => {
       setSnackbar({
         open: true,
-        message: "Removed from favorites successfully.",
+        message: "Removed from favorites successfully ❤️",
         severity: "success",
       });
+      refetch();
     },
     onError: (err) => {
       console.error("Remove favorite error:", err);
@@ -114,6 +104,10 @@ const FavoritesList = () => {
 
   const handleRemoveFavorite = async (ngoId) => {
     try {
+     
+      setFavorites((prev) => prev.filter((fav) => fav.ngo.id !== ngoId));
+
+   
       await removeFavorite({ variables: { ngo_id: ngoId } });
     } catch (error) {
       console.error("Error removing favorite:", error);
@@ -122,7 +116,14 @@ const FavoritesList = () => {
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
         <CircularProgress sx={{ color: "#E76F51" }} />
       </Box>
     );
@@ -136,10 +137,15 @@ const FavoritesList = () => {
       </Box>
     );
 
-  const favorites = data?.userFavorites || [];
-
   return (
-    <Box sx={{ bgcolor: "#FDFCFB", minHeight: "100vh", pt: { xs: 10, sm: 12 }, pb: 6 }}>
+    <Box
+      sx={{
+        bgcolor: "#FDFCFB",
+        minHeight: "100vh",
+        pt: { xs: 10, sm: 12 },
+        pb: 6,
+      }}
+    >
       <Container maxWidth="lg">
         <Typography
           variant="h4"
@@ -156,7 +162,13 @@ const FavoritesList = () => {
         </Typography>
 
         {favorites.length === 0 ? (
-          <Typography sx={{ textAlign: "center", color: "#585858", fontFamily: "'Work Sans', sans-serif" }}>
+          <Typography
+            sx={{
+              textAlign: "center",
+              color: "#585858",
+              fontFamily: "'Work Sans', sans-serif",
+            }}
+          >
             You have not added any favorites yet.
           </Typography>
         ) : (
@@ -182,7 +194,10 @@ const FavoritesList = () => {
                     <CardMedia
                       component="img"
                       height="140"
-                      image={ngo.ngo_picture || "https://res.cloudinary.com/demo/image/upload/v1690000000/default_ngo.jpg"}
+                      image={
+                        ngo.ngo_picture ||
+                        "https://res.cloudinary.com/demo/image/upload/v1690000000/default_ngo.jpg"
+                      }
                       alt={ngo.name}
                     />
                     <CardContent sx={{ flexGrow: 1 }}>
@@ -211,7 +226,8 @@ const FavoritesList = () => {
                             gap: 0.5,
                           }}
                         >
-                          <LocationOnIcon sx={{ fontSize: "1rem" }} /> {ngo.location}
+                          <LocationOnIcon sx={{ fontSize: "1rem" }} />{" "}
+                          {ngo.location}
                         </Typography>
                       )}
                       <Typography
@@ -224,11 +240,24 @@ const FavoritesList = () => {
                           overflow: "hidden",
                         }}
                       >
-                        <DescriptionIcon sx={{ fontSize: "1rem", verticalAlign: "middle", mr: 0.5 }} />
+                        <DescriptionIcon
+                          sx={{
+                            fontSize: "1rem",
+                            verticalAlign: "middle",
+                            mr: 0.5,
+                          }}
+                        />
                         {ngo.description || "No description available."}
                       </Typography>
 
-                      <Box sx={{ mt: 2, display: "flex", justifyContent: "center", gap: 1 }}>
+                      <Box
+                        sx={{
+                          mt: 2,
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: 1,
+                        }}
+                      >
                         <Button
                           variant="contained"
                           sx={navButtonStyle}
