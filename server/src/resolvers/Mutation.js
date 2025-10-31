@@ -193,22 +193,25 @@ async updateEvent(_, args, { user }) {
   return favorite;
 },
 
-removeFavorite: async (_, { ngo_id }, { user }) => {
+removeFavorite: async (_, { ngo_id }, { user, prisma }) => {
   if (!user) throw new Error("Not authenticated");
 
-  const favorite = await prisma.Favorite.findFirst({
-    where: { user_id: user.id, ngo_id },
+  const favorite = await prisma.favorite.findFirst({
+    where: { user_id: user.userId, ngo_id },
   });
 
   if (!favorite) {
     
-    return { message: "Favorite already removed or not found" };
+    return "Favorite already removed or not found";
   }
 
-  await prisma.Favorite.delete({ where: { id: favorite.id } });
+  await prisma.favorite.delete({
+    where: { id: favorite.id },
+  });
 
-  return { message: "Favorite removed successfully" };
+  return "Removed from favorites";
 },
+
 
 
 
