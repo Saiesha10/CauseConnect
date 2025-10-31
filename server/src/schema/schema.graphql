@@ -8,11 +8,11 @@ type User {
   phone: String
   description: String
   created_at: String
-  donations: [Donation]
-  favorites: [Favorite]
-  ngos: [NGO]
+  donations: [Donation!]
+  favorites: [Favorite!]
+  ngos: [NGO!]
   notifications: [Notification]
-  volunteer_events: [EventVolunteer]
+  volunteer_events: [EventVolunteer!]
 }
 
 type NGO {
@@ -24,13 +24,14 @@ type NGO {
   contact_info: String
   donation_link: String
   ngo_picture: String
-  created_by: ID
   created_at: String
-  events: [Event]
-  donations: [Donation]
-  favorites: [Favorite]
-  creator: User
+  created_by: String
+  creator: User        
+  donations: [Donation!]
+  events: [Event!]
+  favorites: [Favorite!]
 }
+
 
 type Event {
   id: ID!

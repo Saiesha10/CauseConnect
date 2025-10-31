@@ -83,6 +83,4 @@ if (process.env.NODE_ENV !== "test") {
     console.error(" Failed to start server:", err);
   });
 }
-startServer().catch((err) => {
-  console.error(" Failed to start server:", err);
-});
+
