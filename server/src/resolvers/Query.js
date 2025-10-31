@@ -22,7 +22,7 @@ export const Query = {
         events: true,
         donations: true,
         favorites: true,
-        created_by: true,
+        creator: true,
       },
     });
 
