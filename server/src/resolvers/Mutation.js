@@ -170,7 +170,7 @@ async updateEvent(_, args, { user }) {
   addFavorite: async (_, { ngo_id }, { user, prisma }) => {
   if (!user || !user.userId) throw new Error("Not authenticated");
 
-  const ngoExists = await prisma.nGO.findUnique({ where: { id: ngo_id } });
+  const ngoExists = await prisma.NGO.findUnique({ where: { id: ngo_id } });
   if (!ngoExists) throw new Error("NGO not found");
 
   const existing = await prisma.favorite.findFirst({
