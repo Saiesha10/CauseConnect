@@ -1,5 +1,5 @@
 
-# 🌍 **CauseConnect**
+# 🌍∞ **CauseConnect**
 
 **CauseConnect** is a full-stack web platform built to bridge the gap between **NGOs, donors, and volunteers**.
 It enables users to explore NGOs, participate in events, make donations, and manage causes seamlessly — powered by **React, Express, GraphQL, Prisma, PostgreSQL, and JWT Auth**.
