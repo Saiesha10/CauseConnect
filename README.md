@@ -4,7 +4,7 @@
 **CauseConnect** is a full-stack web platform built to bridge the gap between **NGOs, donors, and volunteers**.
 It enables users to explore NGOs, participate in events, make donations, and manage causes seamlessly — powered by **React, Express, GraphQL, Prisma, PostgreSQL, and Firebase Authentication**.
 
----
+
 
 ## 🚀 **Overview**
 
@@ -13,7 +13,7 @@ It offers role-based functionalities for **donors**, **organizers**, and **admin
 
 The platform’s architecture is designed to be **scalable**, **modular**, and **easy to maintain**, integrating modern technologies across the stack.
 
----
+
 
 ## ✨ **Core Features**
 
@@ -46,7 +46,7 @@ The platform’s architecture is designed to be **scalable**, **modular**, and *
 
 * Visualize user contributions and volunteering impact.
 
----
+
 
 ## 🧩 **Tech Stack**
 
@@ -82,7 +82,7 @@ The platform’s architecture is designed to be **scalable**, **modular**, and *
 * ✅ **Cypress** — end-to-end tests for validating major user journeys (login, favorites, donations, NGO creation).
 * 🛡️ **Sentry** — integrated for frontend and backend error monitoring.
 
----
+
 
 ## ⚒️ **Project Setup**
 
@@ -117,7 +117,7 @@ Create `.env` files in both `client` and `server` directories:
 
 ```
 REACT_APP_GRAPHQL_URI=https://your-backend-url/graphql
-VITE_CLOUDINARY_CLOUD_NAME="name"
+VITE_CLOUDINARY_CLOUD_NAME="cloud_name"
 VITE_CLOUDINARY_UPLOAD_PRESET="preset"
 ```
 
@@ -151,6 +151,6 @@ npx cypress open
 
 Runs Cypress tests for all major user flows (FavoritesList, Dashboard, Events,Donation, NGO_Listings, NGO_Details, Signup, Login).
 
----
+
 
 
