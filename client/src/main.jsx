@@ -4,7 +4,6 @@ import App from "./App";
 import { ApolloProvider } from "@apollo/client";
 import client from "./apolloClient";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { getTheme } from "./theme";
 import * as Sentry from "@sentry/react";
 
 // Initialize Sentry
@@ -15,15 +14,12 @@ Sentry.init({
 });
 
 const Root = () => {
-  const [mode, setMode] = useState("light");
 
   return (
     <Sentry.ErrorBoundary fallback={null}>
       <ApolloProvider client={client}>
-        <ThemeProvider theme={getTheme(mode)}>
           <CssBaseline />
-          <App mode={mode} setMode={setMode} />
-        </ThemeProvider>
+          <App/>
       </ApolloProvider>
     </Sentry.ErrorBoundary>
   );
